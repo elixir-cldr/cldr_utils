@@ -38,7 +38,8 @@ defmodule CldrUtils.MixProject do
 
   defp deps do
     [
-      {:decimal, "~> 1.4"}
+      {:decimal, "~> 1.4"},
+      {:ex_doc, "~> 0.18", only: [:docs, :dev]}
     ]
   end
 
