@@ -308,7 +308,7 @@ defmodule Cldr.Math do
     :math.log(number)
   end
 
-  @ln10 Decimal.new(2.30258509299)
+  @ln10 Decimal.from_float(2.30258509299)
   def log(%Decimal{} = number) do
     {mantissa, exp} = coef_exponent(number)
     exp = Decimal.new(exp)
@@ -586,7 +586,7 @@ defmodule Cldr.Math do
 
   """
   @precision 0.0001
-  @decimal_precision Decimal.new(@precision)
+  @decimal_precision Decimal.from_float(@precision)
   def sqrt(number, precision \\ @precision)
 
   def sqrt(%Decimal{sign: sign} = number, _precision)
@@ -605,7 +605,13 @@ defmodule Cldr.Math do
       |> :math.sqrt()
       |> Decimal.from_float()
 
-    decimal_precision = Decimal.new(precision)
+    decimal_precision =
+      if is_integer(precision) do
+        Decimal.new(precision)
+      else
+        Decimal.from_float(precision)
+      end
+
     do_sqrt(number, initial_estimate, @decimal_precision, decimal_precision)
   end
 
@@ -684,7 +690,7 @@ defmodule Cldr.Math do
     end
   end
 
-  @decimal_root_precision Decimal.new(@root_precision)
+  @decimal_root_precision Decimal.from_float(@root_precision)
   defp do_root(%Decimal{} = number, %Decimal{} = nth, %Decimal{} = root) do
     d1 = Decimal.div(@one, nth)
     d2 = Decimal.div(number, power(root, Decimal.sub(nth, @one)))

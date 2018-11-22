@@ -9,7 +9,7 @@ defmodule Math.Test do
   end
 
   test "integer number of digits for a decimal fixnum" do
-    decimal = Decimal.new(1234.5678)
+    decimal = Decimal.from_float(1234.5678)
     assert Digits.number_of_integer_digits(decimal) == 4
   end
 
@@ -19,13 +19,13 @@ defmodule Math.Test do
   end
 
   test "round significant digits for a decimal" do
-    decimal = Decimal.new(1234.45)
+    decimal = Decimal.from_float(1234.45)
     assert Math.round_significant(decimal, 4) == Decimal.reduce(Decimal.new(1234))
   end
 
   test "round significant digits for a decimal to 5 digits" do
-    decimal = Decimal.new(1234.45)
-    assert Math.round_significant(decimal, 5) == Decimal.reduce(Decimal.new(1234.5))
+    decimal = Decimal.from_float(1234.45)
+    assert Math.round_significant(decimal, 5) == Decimal.reduce(Decimal.from_float(1234.5))
   end
 
   test "power of 0 == 1" do
@@ -37,7 +37,7 @@ defmodule Math.Test do
   end
 
   test "power of decimal where n < 0" do
-    assert Math.power(Decimal.new(4), -2) == Decimal.new(0.0625)
+    assert Math.power(Decimal.new(4), -2) == Decimal.from_float(0.0625)
   end
 
   test "power of decimal where number < 0" do

@@ -10,8 +10,8 @@ defmodule Math.Log.Test do
 
   Enum.each(@samples, fn {sample, result} ->
     test "that decimal log(e) is correct for #{inspect(sample)}" do
-      calc = Cldr.Math.log(Decimal.new(unquote(sample))) |> Decimal.round(@round)
-      sample = Decimal.new(unquote(result)) |> Decimal.round(@round)
+      calc = Cldr.Math.log(Decimal.new(unquote(to_string(sample)))) |> Decimal.round(@round)
+      sample = Decimal.new(unquote(to_string(result))) |> Decimal.round(@round)
       assert Decimal.cmp(calc, sample) == :eq
     end
   end)
@@ -25,7 +25,7 @@ defmodule Math.Log.Test do
   @diff 0.005
   Enum.each(random, fn x ->
     test "that decimal log(e) is more or less the same as bif log(e) for #{inspect(x)}" do
-      assert :math.log(unquote(x)) - Cldr.Math.to_float(Cldr.Math.log(Decimal.new(unquote(x)))) <
+      assert :math.log(unquote(x)) - Cldr.Math.to_float(Cldr.Math.log(Decimal.new(unquote(to_string(x))))) <
                @diff
     end
   end)

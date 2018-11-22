@@ -48,13 +48,13 @@ defmodule Math.Power.Test do
 
   test "Short cut decimal power of 10 for a negative number" do
     p = Cldr.Math.power(Decimal.new(10), -2)
-    assert Decimal.cmp(p, Decimal.new(0.01)) == :eq
+    assert Decimal.cmp(p, Decimal.new("0.01")) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), -3)
-    assert Decimal.cmp(p, Decimal.new(0.001)) == :eq
+    assert Decimal.cmp(p, Decimal.new("0.001")) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), -4)
-    assert Decimal.cmp(p, Decimal.new(0.0001)) == :eq
+    assert Decimal.cmp(p, Decimal.new("0.0001")) == :eq
   end
 
   test "A specific bug fix" do
