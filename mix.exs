@@ -1,7 +1,7 @@
 defmodule CldrUtils.MixProject do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "2.0.1"
 
   def project do
     [
@@ -38,7 +38,7 @@ defmodule CldrUtils.MixProject do
 
   defp deps do
     [
-      {:decimal, "~> 1.4"},
+      {:decimal, "~> 1.5"},
       {:ex_doc, "~> 0.18", only: [:docs, :dev]}
     ]
   end
