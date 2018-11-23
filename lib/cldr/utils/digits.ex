@@ -249,7 +249,7 @@ defmodule Cldr.Digits do
 
   ## Examples
 
-      iex> Cldr.Digits.number_of_leading_zeros(Decimal.new(0.0001))
+      iex> Cldr.Digits.number_of_leading_zeros(Decimal.new("0.0001"))
       3
 
   """

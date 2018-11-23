@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.0.2
+
+This is the changelog for Cldr Utils v2.0.2 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+
+### Enhancements
+
+* Replace *additional* deprecated `Decimal.new/1` with `Decimal.from_float/1` where required
+
 ## Changelog for Cldr Utils version 2.0.1
 
 This is the changelog for Cldr Utils v2.0.1 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)

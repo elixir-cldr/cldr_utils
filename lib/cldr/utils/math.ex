@@ -94,10 +94,10 @@ defmodule Cldr.Math do
       iex> Cldr.Math.mod(Decimal.new("1234.456"), 5)
       #Decimal<4.456>
 
-      iex> Cldr.Math.mod(Decimal.new(123.456), Decimal.new(3.4))
+      iex> Cldr.Math.mod(Decimal.new("123.456"), Decimal.new("3.4"))
       #Decimal<1.056>
 
-      iex> Cldr.Math.mod Decimal.new(123.456), 3.4
+      iex> Cldr.Math.mod Decimal.new("123.456"), 3.4
       #Decimal<1.056>
 
   """
@@ -136,8 +136,12 @@ defmodule Cldr.Math do
     Decimal.sub(number, modulo)
   end
 
-  def mod(%Decimal{} = number, modulus) when is_number(modulus) do
+  def mod(%Decimal{} = number, modulus) when is_integer(modulus) do
     mod(number, Decimal.new(modulus))
+  end
+
+  def mod(%Decimal{} = number, modulus) when is_float(modulus) do
+    mod(number, Decimal.from_float(modulus))
   end
 
   @doc """
@@ -581,7 +585,7 @@ defmodule Cldr.Math do
       iex> Cldr.Math.sqrt(Decimal.new(9))
       #Decimal<3.0>
 
-      iex> Cldr.Math.sqrt(Decimal.new(9.869))
+      iex> Cldr.Math.sqrt(Decimal.new("9.869"))
       #Decimal<3.141496458696078173887197038>
 
   """
