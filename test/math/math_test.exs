@@ -13,6 +13,11 @@ defmodule Math.Test do
     assert Digits.number_of_integer_digits(decimal) == 4
   end
 
+  test "rounding decimal number" do
+    decimal = Decimal.new("0.1111") |> Cldr.Math.round
+    assert decimal.sign == 1
+  end
+
   test "round significant digits for a decimal integer" do
     decimal = Decimal.new(1234)
     assert Math.round_significant(decimal, 2) == Decimal.reduce(Decimal.new(1200))

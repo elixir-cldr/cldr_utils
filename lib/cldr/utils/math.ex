@@ -767,8 +767,8 @@ defmodule Cldr.Math do
   def round_digits(digits_t, %{decimals: true}), do: digits_t
 
   # rounded away all the decimals... return 0
-  def round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, true}
-  def round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, true}
+  def round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
+  def round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
 
   def round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
     {digits, place, sign} = do_round(digits_t, dp + place - 1, options)
