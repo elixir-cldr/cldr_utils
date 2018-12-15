@@ -714,11 +714,26 @@ defmodule Cldr.Math do
     @rounding_modes
   end
 
+  # Originally adapted from https://github.com/ewildgoose/elixir-float_pp but the
+  # results were inconsistent with `Decimal` so now all rounding is done in decimal.
+  # This incurs conversion which, especially for floats, is not a perfect solution.
+  # Since this function is here primarily to support number formatting in Cldr we
+  # consider it currently acceptable.
+
   @doc """
   Round a number to an arbitrary precision using one of several rounding algorithms.
 
   Rounding algorithms are based on the definitions given in IEEE 754, but also
   include 2 additional options (effectively the complementary versions):
+
+  ## Arguments
+
+  * `number` is a `float`, `integer` or `Decimal`
+
+  * `places` is an integer number of places to round to
+
+  * `mode` is the rounding mode to be applied.  The
+    default is `half_even`
 
   ## Rounding algorithms
 
@@ -745,103 +760,41 @@ defmodule Cldr.Math do
   * `:half_down` - Round to nearest value, but in a tiebreak, round towards 0
     (Non IEEE algorithm)
 
+  ## Notes
+
+  * When the `number` is a `Decimal`, the results are identical
+    to `Decimal.round/3`
+
+  * When the `number` is a `float`, `places` is `0` and `mode`
+    is `:half_up` then the result is the same as `Kernel.trunc/1`
+
   """
+  def round(number, places \\ 0, mode \\ :half_even)
 
-  # The canonical function head that takes a number and returns a number.
-  def round(number, places \\ 0, mode \\ :half_up) when is_integer(places) and is_atom(mode) do
+  def round(%Decimal{} = number, places, mode) do
+    Decimal.round(number, places, mode)
+  end
+
+  # Consistent with Kernel.round/1
+  def round(number, 0 = places, :half_up = mode) when is_float(number) do
     number
-    |> Digits.to_digits()
-    |> round_digits(%{decimals: places, rounding: mode})
-    |> Digits.to_number(number)
+    |> Decimal.from_float
+    |> Decimal.round(places, mode)
+    |> to_float
+    |> trunc
   end
 
-  # The next function heads operate on decomposed numbers returned
-  # by Digits.to_digits.
-
-  # scientific/decimal rounding are the same, we are just varying which
-  # digit we start counting from to find our rounding point
-  def round_digits(digits_t, options)
-
-  # Passing true for decimal places avoids rounding and uses whatever is necessary
-  def round_digits(digits_t, %{scientific: true}), do: digits_t
-  def round_digits(digits_t, %{decimals: true}), do: digits_t
-
-  # rounded away all the decimals... return 0
-  def round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
-  def round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
-
-  def round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
-    {digits, place, sign} = do_round(digits_t, dp + place - 1, options)
-    {List.flatten(digits), place, sign}
+  def round(number, places, mode) when is_float(number) do
+    number
+    |> Decimal.from_float
+    |> Decimal.round(places, mode)
+    |> to_float
   end
 
-  def round_digits(digits_t, options = %{scientific: dp}) do
-    {digits, place, sign} = do_round(digits_t, dp, options)
-    {List.flatten(digits), place, sign}
+  def round(number, places, mode) when is_integer(number) do
+    number
+    |> Decimal.new
+    |> Decimal.round(places, mode)
+    |> Decimal.to_integer
   end
-
-  defp do_round({digits, place, positive}, round_at, %{rounding: rounding}) do
-    case Enum.split(digits, round_at) do
-      {l, [least_sig | [tie | rest]]} ->
-        case do_incr(l, least_sig, increment?(positive, least_sig, tie, rest, rounding)) do
-          [:rollover | digits] -> {digits, place + 1, positive}
-          digits -> {digits, place, positive}
-        end
-
-      {l, [least_sig | []]} ->
-        {[l, least_sig], place, positive}
-
-      {l, []} ->
-        {l, place, positive}
-    end
-  end
-
-  # Helper functions for round/2-3
-  defp do_incr(l, least_sig, false), do: [l, least_sig]
-  defp do_incr(l, least_sig, true) when least_sig < 9, do: [l, least_sig + 1]
-  # else need to cascade the increment
-  defp do_incr(l, 9, true) do
-    l
-    |> Enum.reverse()
-    |> cascade_incr
-    |> Enum.reverse([0])
-  end
-
-  # cascade an increment of decimal digits which could be rolling over 9 -> 0
-  defp cascade_incr([9 | rest]), do: [0 | cascade_incr(rest)]
-  defp cascade_incr([d | rest]), do: [d + 1 | rest]
-  defp cascade_incr([]), do: [1, :rollover]
-
-  @spec increment?(boolean, non_neg_integer | nil, non_neg_integer | nil, list(), atom()) ::
-          boolean
-  defp increment?(positive, least_sig, tie, rest, round)
-
-  # Directed rounding towards 0 (truncate)
-  defp increment?(_, _ls, _tie, _, :down), do: false
-  # Directed rounding away from 0 (non IEEE option)
-  defp increment?(_, _ls, nil, _, :up), do: false
-  defp increment?(_, _ls, _tie, _, :up), do: true
-
-  # Directed rounding towards +∞ (rounding up / ceiling)
-  defp increment?(true, _ls, tie, _, :ceiling) when tie != nil, do: true
-  defp increment?(_, _ls, _tie, _, :ceiling), do: false
-
-  # Directed rounding towards -∞ (rounding down / floor)
-  defp increment?(false, _ls, tie, _, :floor) when tie != nil, do: true
-  defp increment?(_, _ls, _tie, _, :floor), do: false
-
-  # Round to nearest - tiebreaks by rounding to even
-  # Default IEEE rounding, recommended default for decimal
-  defp increment?(_, ls, 5, [], :half_even) when Integer.is_even(ls), do: false
-  defp increment?(_, _ls, tie, _rest, :half_even) when tie >= 5, do: true
-  defp increment?(_, _ls, _tie, _rest, :half_even), do: false
-
-  # Round to nearest - tiebreaks by rounding away from zero (same as Elixir Kernel.round)
-  defp increment?(_, _ls, tie, _rest, :half_up) when tie >= 5, do: true
-  defp increment?(_, _ls, _tie, _rest, :half_up), do: false
-
-  # Round to nearest - tiebreaks by rounding towards zero (non IEEE option)
-  defp increment?(_, _ls, 5, [], :half_down), do: false
-  defp increment?(_, _ls, tie, _rest, :half_down) when tie >= 5, do: true
-  defp increment?(_, _ls, _tie, _rest, :half_down), do: false
 end

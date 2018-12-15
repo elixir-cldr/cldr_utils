@@ -3,6 +3,20 @@ defmodule Math.Test do
   alias Cldr.Math
   alias Cldr.Digits
 
+  use ExUnitProperties
+
+  property "check rounding for decimals is the same as Decimal.round/3" do
+    check all decimal <- GenerateNumber.decimal(), max_runs: 1_000 do
+      assert Decimal.round(decimal) == Cldr.Math.round(decimal)
+    end
+  end
+
+  property "check rounding for floats is the same as Kernel.round/1" do
+    check all float <- GenerateNumber.float(), max_runs: 1_000 do
+      assert Kernel.round(float) == Cldr.Math.round(float, 0, :half_up)
+    end
+  end
+
   test "integer number of digits for a decimal integer" do
     decimal = Decimal.new(1234)
     assert Digits.number_of_integer_digits(decimal) == 4
@@ -15,8 +29,20 @@ defmodule Math.Test do
 
   test "rounding decimal number" do
     decimal = Decimal.new("0.1111") |> Cldr.Math.round
+    assert Decimal.cmp(decimal, Decimal.new(0))
     assert decimal.sign == 1
   end
+
+  @decimals [Decimal.new("0.9876"), Decimal.new("1.9876"), Decimal.new("0.4"), Decimal.new("0.6")]
+  @places [0, 1, 2, 3]
+  @rounding [:half_even, :floor, :ceiling, :half_up, :half_down]
+  for d <- @decimals, p <- @places, r <- @rounding do
+    test "default rounding is the same as Decimal.round for #{inspect d}, places: #{inspect p}, mode: #{inspect r}" do
+      assert Cldr.Math.round(unquote(Macro.escape(d)), unquote(p), unquote(r)) ==
+             Decimal.round(unquote(Macro.escape(d)), unquote(p), unquote(r))
+    end
+  end
+
 
   test "round significant digits for a decimal integer" do
     decimal = Decimal.new(1234)

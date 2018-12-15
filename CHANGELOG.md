@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.0.4
+
+This is the changelog for Cldr Utils v2.0.4 released on Decmber 15th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fixes `Cldr.Math.round/3` to be compatible with `Decimal.round/3` and `Kernel.round/1`
+
 ## Changelog for Cldr Utils version 2.0.3
 
 This is the changelog for Cldr Utils v2.0.3 released on Decmber 8th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
