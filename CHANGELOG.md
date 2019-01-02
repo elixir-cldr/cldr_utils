@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.0.5
+
+This is the changelog for Cldr Utils v2.0.4 released on Jnauary 3rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fixes `Cldr.Math.round/3` for floats when rounding is > 0 digits
+
 ## Changelog for Cldr Utils version 2.0.4
 
 This is the changelog for Cldr Utils v2.0.4 released on Decmber 15th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)

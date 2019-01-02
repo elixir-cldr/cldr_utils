@@ -7,7 +7,7 @@ defmodule Math.Test do
 
   property "check rounding for decimals is the same as Decimal.round/3" do
     check all decimal <- GenerateNumber.decimal(), max_runs: 1_000 do
-      assert Decimal.round(decimal) == Cldr.Math.round(decimal)
+      assert Decimal.round(decimal, 0, :half_up) == Cldr.Math.round(decimal, 0, :half_up)
     end
   end
 
@@ -20,6 +20,13 @@ defmodule Math.Test do
   test "integer number of digits for a decimal integer" do
     decimal = Decimal.new(1234)
     assert Digits.number_of_integer_digits(decimal) == 4
+  end
+
+  test "rounding floats" do
+    assert Cldr.Math.round(1.401, 2, :half_even) == 1.4
+    assert Cldr.Math.round(1.404, 2, :half_even) == 1.4
+    assert Cldr.Math.round(1.405, 2, :half_even) == 1.4
+    assert Cldr.Math.round(1.406, 2, :half_even) == 1.41
   end
 
   test "integer number of digits for a decimal fixnum" do
