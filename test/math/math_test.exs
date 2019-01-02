@@ -11,7 +11,7 @@ defmodule Math.Test do
     end
   end
 
-  property "check rounding for floats is the same as Kernel.round/1" do
+  property "check rounding to zero places for floats is the same as Kernel.round/1" do
     check all float <- GenerateNumber.float(), max_runs: 1_000 do
       assert Kernel.round(float) == Cldr.Math.round(float, 0, :half_up)
     end
@@ -42,7 +42,6 @@ defmodule Math.Test do
              Decimal.round(unquote(Macro.escape(d)), unquote(p), unquote(r))
     end
   end
-
 
   test "round significant digits for a decimal integer" do
     decimal = Decimal.new(1234)

@@ -177,6 +177,7 @@ defmodule Cldr.Math do
   This is very likely to lose precision - lots of numbers won't
   make the round trip conversion.  Use with care.  Actually, better
   not to use it at all.
+
   """
   @spec to_float(%Decimal{}) :: float
   def to_float(%Decimal{sign: sign, coef: coef, exp: exp}) do

@@ -8,7 +8,4 @@ defmodule CldrUtilsTest do
   doctest Cldr.Map
   doctest Cldr.String
 
-  test "greets the world" do
-    assert CldrUtils.hello() == :world
-  end
 end
