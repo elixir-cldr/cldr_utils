@@ -24,4 +24,11 @@ defmodule Support.Map.Test do
 
     assert Cldr.Map.atomize_keys(test_map) == test_result
   end
+
+  test "that interizing negative integer keys works" do
+    map = %{"-1" => "something"}
+    result = %{-1 => "something"}
+
+    assert Cldr.Map.integerize_keys(map) == result
+  end
 end

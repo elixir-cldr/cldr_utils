@@ -383,7 +383,7 @@ defmodule Cldr.Map do
     x
   end
 
-  @integer_reg Regex.compile!("^[0-9]+$")
+  @integer_reg Regex.compile!("^-?[0-9]+$")
   defp integerize_element(x) when is_atom(x) do
     integer =
       x
