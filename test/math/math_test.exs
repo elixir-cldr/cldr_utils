@@ -92,4 +92,16 @@ defmodule Math.Test do
   test "power of integer when n < 1" do
     assert Math.power(4, -2) == 0.0625
   end
+
+  test "amod returns the divisor when it the remainder would be zero" do
+    {div, amod} = Cldr.Math.div_amod(24, 12)
+    assert amod == 12
+    assert div == 2
+  end
+
+  test "amod returns the zero for the remainder" do
+    {div, mod} = Cldr.Math.div_mod(24, 12)
+    assert mod == 0
+    assert div == 2
+  end
 end

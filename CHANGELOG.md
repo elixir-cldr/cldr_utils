@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.1.0
+
+This is the changelog for Cldr Utils v2.1.0 released on March 24th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+
+### Enhancements
+
+* Add `Cldr.Math.div_amod/2`
+
 ## Changelog for Cldr Utils version 2.0.6
 
 This is the changelog for Cldr Utils v2.0.6 released on March 10th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
