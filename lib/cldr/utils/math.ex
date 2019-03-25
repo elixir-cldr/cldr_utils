@@ -170,6 +170,24 @@ defmodule Cldr.Math do
   end
 
   @doc """
+  Returns the adusted remainder and dividend of two
+  integers.
+
+  This version will return the divisor if the remainder
+  would otherwise be zero.
+
+  """
+  @spec div_amod(integer, integer) :: {integer, integer}
+  def div_amod(int1, int2) do
+    {div, mod} = div_mod(int1, int2)
+    if mod == 0 do
+      {div - 1, int2}
+    else
+      {div, mod}
+    end
+  end
+
+  @doc """
   Convert a Decimal to a float
 
   * `decimal` must be a Decimal
