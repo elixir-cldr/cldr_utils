@@ -1,10 +1,10 @@
-## Changelog for Cldr Utils version 2.0.6
+## Changelog for Cldr Utils version 2.1.0
 
-This is the changelog for Cldr Utils v2.0.6 released on March 10th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.1.0 released on March 10th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
 
 ### Bug Fixes
 
-* `Cldr.Map.integerize_keys/1` now properly processes negative integer keys
+* `Cldr.Map.integerize_keys/1` now properly processes negative integer keys. Minor version change to make it easier to peg versions in upstream packages.
 
 ## Changelog for Cldr Utils version 2.0.5
 
