@@ -7,5 +7,4 @@ defmodule CldrUtilsTest do
   doctest Cldr.Helpers
   doctest Cldr.Map
   doctest Cldr.String
-
 end

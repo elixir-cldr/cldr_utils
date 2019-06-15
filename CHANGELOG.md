@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.3.0
+
+This is the changelog for Cldr Utils v2.3.0 released on June 15th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+
+### Enhancements
+
+* Adds `doc_since/1` and `calendar_impl/0` to support conditional compilation based upon Elixir versions
+
 ## Changelog for Cldr Utils version 2.2.0
 
 This is the changelog for Cldr Utils v2.2.0 released on March 25th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
