@@ -12,7 +12,7 @@ defmodule CldrUtils.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      source_url: "https://github.com/kipcole9/cldr_utils",
+      source_url: "https://github.com/elixir-cldr/cldr_utils",
       test_coverage: [tool: ExCoveralls],
       aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -62,9 +62,9 @@ defmodule CldrUtils.MixProject do
 
   def links do
     %{
-      "GitHub" => "https://github.com/kipcole9/cldr_utils",
-      "Readme" => "https://github.com/kipcole9/cldr_utils/blob/v#{@version}/README.md",
-      "Changelog" => "https://github.com/kipcole9/cldr_utils/blob/v#{@version}/CHANGELOG.md"
+      "GitHub" => "https://github.com/elixir-cldr/cldr_utils",
+      "Readme" => "https://github.com/elixir-cldr/cldr_utils/blob/v#{@version}/README.md",
+      "Changelog" => "https://github.com/elixir-cldr/cldr_utils/blob/v#{@version}/CHANGELOG.md"
     }
   end
 

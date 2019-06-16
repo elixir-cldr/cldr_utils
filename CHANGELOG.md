@@ -1,6 +1,6 @@
 ## Changelog for Cldr Utils version 2.3.0
 
-This is the changelog for Cldr Utils v2.3.0 released on June 15th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.3.0 released on June 15th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
@@ -8,7 +8,7 @@ This is the changelog for Cldr Utils v2.3.0 released on June 15th, 2019.  For ol
 
 ## Changelog for Cldr Utils version 2.2.0
 
-This is the changelog for Cldr Utils v2.2.0 released on March 25th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.2.0 released on March 25th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
@@ -16,7 +16,7 @@ This is the changelog for Cldr Utils v2.2.0 released on March 25th, 2019.  For o
 
 ## Changelog for Cldr Utils version 2.1.0
 
-This is the changelog for Cldr Utils v2.1.0 released on March 10th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.1.0 released on March 10th, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
@@ -24,7 +24,7 @@ This is the changelog for Cldr Utils v2.1.0 released on March 10th, 2019.  For o
 
 ## Changelog for Cldr Utils version 2.0.5
 
-This is the changelog for Cldr Utils v2.0.4 released on Jnauary 3rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.4 released on Jnauary 3rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
@@ -32,7 +32,7 @@ This is the changelog for Cldr Utils v2.0.4 released on Jnauary 3rd, 2018.  For 
 
 ## Changelog for Cldr Utils version 2.0.4
 
-This is the changelog for Cldr Utils v2.0.4 released on Decmber 15th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.4 released on Decmber 15th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
@@ -40,7 +40,7 @@ This is the changelog for Cldr Utils v2.0.4 released on Decmber 15th, 2018.  For
 
 ## Changelog for Cldr Utils version 2.0.3
 
-This is the changelog for Cldr Utils v2.0.3 released on Decmber 8th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.3 released on Decmber 8th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
@@ -48,7 +48,7 @@ This is the changelog for Cldr Utils v2.0.3 released on Decmber 8th, 2018.  For 
 
 ## Changelog for Cldr Utils version 2.0.2
 
-This is the changelog for Cldr Utils v2.0.2 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.2 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
@@ -56,7 +56,7 @@ This is the changelog for Cldr Utils v2.0.2 released on November 23rd, 2018.  Fo
 
 ## Changelog for Cldr Utils version 2.0.1
 
-This is the changelog for Cldr Utils v2.0.1 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.1 released on November 23rd, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
@@ -64,7 +64,7 @@ This is the changelog for Cldr Utils v2.0.1 released on November 23rd, 2018.  Fo
 
 ## Changelog for Cldr Utils version 2.0.0
 
-This is the changelog for Cldr Utils v2.0.0 released on October 29th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.0.0 released on October 29th, 2018.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
