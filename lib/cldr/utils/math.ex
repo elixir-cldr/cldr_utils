@@ -180,6 +180,7 @@ defmodule Cldr.Math do
   @spec div_amod(integer, integer) :: {integer, integer}
   def div_amod(int1, int2) do
     {div, mod} = div_mod(int1, int2)
+
     if mod == 0 do
       {div - 1, int2}
     else
@@ -796,15 +797,15 @@ defmodule Cldr.Math do
 
   def round(number, places, mode) when is_integer(number) do
     number
-    |> Decimal.new
+    |> Decimal.new()
     |> Decimal.round(places, mode)
-    |> Decimal.to_integer
+    |> Decimal.to_integer()
   end
 
   # Consistent with Kernel.round/1
   def round(number, 0 = places, :half_up = mode) when is_float(number) do
     number
-    |> Decimal.from_float
+    |> Decimal.from_float()
     |> Decimal.round(places, mode)
     |> to_float
     |> trunc

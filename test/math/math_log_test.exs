@@ -25,7 +25,8 @@ defmodule Math.Log.Test do
   @diff 0.005
   Enum.each(random, fn x ->
     test "that decimal log(e) is more or less the same as bif log(e) for #{inspect(x)}" do
-      assert :math.log(unquote(x)) - Cldr.Math.to_float(Cldr.Math.log(Decimal.new(unquote(to_string(x))))) <
+      assert :math.log(unquote(x)) -
+               Cldr.Math.to_float(Cldr.Math.log(Decimal.new(unquote(to_string(x))))) <
                @diff
     end
   end)
