@@ -73,6 +73,7 @@ defmodule CldrUtils.MixProject do
     [
       source_ref: "v#{@version}",
       main: "readme",
+      logo: "logo.png",
       extras: [
         "README.md",
         "LICENSE.md",
