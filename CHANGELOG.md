@@ -1,6 +1,14 @@
+## Changelog for Cldr Utils version 2.5.0
+
+This is the changelog for Cldr Utils v2.5.0 released on October 22nd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Add `Cldr.Macros.warn_once/3` to log a warning, but only once for a given key
+
 ## Changelog for Cldr Utils version 2.4.0
 
-This is the changelog for Cldr Utils v2.4.0 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/kipcole9/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.4.0 released on August 23rd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 

@@ -6,6 +6,7 @@ Utility functions extracted from [cldr](https://github,com/kipcole9/cldr)
 * Math functions including `mod/2` that works on floored division
 * Number functions for working with the number of digits, the fraction as an integer, ...
 * String function for underscoring (converting CamelCase to snake case)
+* Various macros
 
 ## Installation
 
