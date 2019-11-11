@@ -1,13 +1,12 @@
 defmodule CldrUtils.MixProject do
   use Mix.Project
 
-  @version "2.5.0"
+  @version "2.3.0"
 
   def project do
     [
       app: :cldr_utils,
       version: @version,
-      licenses: ["Apache-2.0"],
       elixir: "~> 1.5",
       description: description(),
       start_permanent: Mix.env() == :prod,
@@ -19,7 +18,7 @@ defmodule CldrUtils.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
-        plt_add_apps: ~w(mix)a
+        plt_add_apps: ~w(gettext inets jason mix poison plug)a
       ],
       compilers: Mix.compilers()
     ]
@@ -41,8 +40,7 @@ defmodule CldrUtils.MixProject do
     [
       {:decimal, "~> 1.5"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
-      {:stream_data, "~> 0.4", only: :test},
-      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false, optional: true}
+      {:stream_data, "~> 0.4", only: :test}
     ]
   end
 
@@ -74,7 +72,6 @@ defmodule CldrUtils.MixProject do
     [
       source_ref: "v#{@version}",
       main: "readme",
-      logo: "logo.png",
       extras: [
         "README.md",
         "LICENSE.md",
