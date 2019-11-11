@@ -22,4 +22,17 @@ defmodule Cldr.Macros do
       end
     end
   end
+
+  defmacro warn_once(key, message, level \\ :warn) do
+    caller = __CALLER__.module
+
+    quote do
+      require Logger
+
+      if :persistent_term.get({unquote(caller), unquote(key)}, true) do
+        Logger.unquote(level)(unquote(message))
+        :persistent_term.put({unquote(caller), unquote(key)}, nil)
+      end
+    end
+  end
 end

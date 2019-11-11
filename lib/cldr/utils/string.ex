@@ -5,13 +5,35 @@ defmodule Cldr.String do
   """
 
   @doc """
+  Hash a string using a polynomial rolling hash function.
+
+  See https://cp-algorithms.com/string/string-hashing.html for
+  a description of the algoithim.
+
+  """
+
+  @p 99991
+  @m trunc(1.0e9) + 9
+  def hash(string) do
+    {hash, _} =
+      string
+      |> String.to_charlist
+      |> Enum.reduce({0, 1}, fn char, {hash, p_pow} ->
+        hash = rem(hash + char * p_pow, @m)
+        p_pow = rem(p_pow * @p, @m)
+        {hash, p_pow}
+      end)
+    hash
+  end
+
+  @doc """
   This is the code of Macro.underscore with modifications:
 
   The change is to cater for strings in the format:
 
     This_That
 
-  which in Macro.underscore get formatted as
+  which in Macro.underscore gets formatted as
 
     this__that (note the double underscore)
 
