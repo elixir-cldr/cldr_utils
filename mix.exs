@@ -7,6 +7,7 @@ defmodule CldrUtils.MixProject do
     [
       app: :cldr_utils,
       version: @version,
+      licenses: ["Apache-2.0"],
       elixir: "~> 1.5",
       description: description(),
       start_permanent: Mix.env() == :prod,
