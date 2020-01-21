@@ -152,7 +152,7 @@ defmodule Cldr.Math do
   def amod(x, y) do
     case mod = mod(x, y) do
       %Decimal{} = decimal_mod ->
-        if Decimal.cmp(decimal_mod, @decimal_zero) == :eq, do: y, else: mod
+        if decimal_compare(decimal_mod, @decimal_zero) == :eq, do: y, else: mod
 
       _ ->
         if mod == 0, do: y, else: mod
@@ -283,9 +283,16 @@ defmodule Cldr.Math do
       end
   end
 
-  def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 do
-    round_significant(Decimal.abs(number), n)
-    |> Decimal.minus()
+  if Code.ensure_loaded?(Decimal) and function_exported?(Decimal, :negate, 1) do
+    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 do
+      round_significant(Decimal.abs(number), n)
+      |> Decimal.negate()
+    end
+  else
+    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 do
+      round_significant(Decimal.abs(number), n)
+      |> Decimal.minus()
+    end
   end
 
   def round_significant(%Decimal{sign: sign} = number, n) when sign > 0 do
@@ -654,7 +661,7 @@ defmodule Cldr.Math do
       |> Decimal.sub(old_estimate)
       |> Decimal.abs()
 
-    if Decimal.cmp(diff, old_estimate) == :lt || Decimal.cmp(diff, old_estimate) == :eq do
+    if decimal_compare(diff, old_estimate) == :lt || decimal_compare(diff, old_estimate) == :eq do
       estimate
     else
       Decimal.div(number, Decimal.mult(@two, estimate))
@@ -721,7 +728,7 @@ defmodule Cldr.Math do
     d3 = Decimal.sub(d2, root)
     delta = Decimal.mult(d1, d3)
 
-    if Decimal.cmp(delta, @decimal_root_precision) == :gt do
+    if decimal_compare(delta, @decimal_root_precision) == :gt do
       do_root(number, nth, Decimal.add(root, delta))
     else
       root
@@ -856,6 +863,21 @@ defmodule Cldr.Math do
 
       {l, []} ->
         {l, place, positive}
+    end
+  end
+
+  @doc false
+  @decimal_version Application.ensure_all_started(:decimal) && Application.spec(:decimal)
+                   |> Keyword.get(:vsn)
+                   |> List.to_string
+
+  if Version.match?(@decimal_version, "~> 1.6 or ~> 1.9.0-rc") do
+    def decimal_compare(d1, d2) do
+      Decimal.cmp(d1, d2)
+    end
+  else
+    def decimal_compare(d1, d2) do
+      Decimal.compare(d1, d2)
     end
   end
 

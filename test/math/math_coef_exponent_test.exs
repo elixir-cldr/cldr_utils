@@ -48,7 +48,7 @@ defmodule Math.Mantissa.Exponent.Test do
         |> Decimal.mult(coef)
 
       # And confirm we made the round trip
-      assert Decimal.cmp(calculated_value, test_value) == :eq
+      assert Cldr.Math.decimal_compare(calculated_value, test_value) == :eq
     end
   end)
 end

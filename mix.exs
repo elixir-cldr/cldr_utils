@@ -1,13 +1,13 @@
 defmodule CldrUtils.MixProject do
   use Mix.Project
 
-  @version "2.3.0"
+  @version "2.6.0"
 
   def project do
     [
       app: :cldr_utils,
       version: @version,
-      elixir: "~> 1.5",
+      elixir: "~> 1.6",
       description: description(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -38,7 +38,7 @@ defmodule CldrUtils.MixProject do
 
   defp deps do
     [
-      {:decimal, "~> 1.5"},
+      {:decimal, "~> 1.6 or ~> 1.9.0-rc or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test}
     ]

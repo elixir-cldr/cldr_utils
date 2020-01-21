@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.6.0
+
+This is the changelog for Cldr Utils v2.6.0 released on January 21st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Support `Decimal` versions `~> 1.6 or 1.9 or 2.0`.  Version 1.9 deprecates `Decimal.compare/2` in favour of `Decimal.cmp/2`. The upcoming `Decimal` version 2.0 deprecates `Decimal.cmp/2` in favour of a new implementation of `Decimal.compare/2` that conforms to Elixir norms and is required to support `Enum.sort/2` correctly.  This version of `cldr_utils` detects the relevant version and adapts accordingly at compile time.
+
 ## Changelog for Cldr Utils version 2.5.0
 
 This is the changelog for Cldr Utils v2.5.0 released on October 22nd, 2019.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

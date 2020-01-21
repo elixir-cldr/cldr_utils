@@ -13,7 +13,7 @@ defmodule Math.Sqrt.Test do
 
   Enum.each(@roots, fn {value, root} ->
     test "square root of #{inspect(value)} should be #{root}" do
-      assert Decimal.cmp(
+      assert Cldr.Math.decimal_compare(
                Cldr.Math.sqrt(Decimal.new(unquote(to_string(value)))),
                Decimal.new(unquote(to_string(root)))
              ) == :eq

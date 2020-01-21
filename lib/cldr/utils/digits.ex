@@ -338,10 +338,18 @@ defmodule Cldr.Digits do
     flonum(float, frac, exp)
   end
 
-  def to_digits(%Decimal{} = number) do
-    %Decimal{coef: coef, exp: exp, sign: sign} = Decimal.reduce(number)
-    {digits, _place, _sign} = to_digits(coef)
-    {digits, length(digits) + exp, sign}
+  if Code.ensure_loaded?(Decimal) and function_exported?(Decimal, :normalize, 1) do
+    def to_digits(%Decimal{} = number) do
+      %Decimal{coef: coef, exp: exp, sign: sign} = Decimal.normalize(number)
+      {digits, _place, _sign} = to_digits(coef)
+      {digits, length(digits) + exp, sign}
+    end
+  else
+    def to_digits(%Decimal{} = number) do
+      %Decimal{coef: coef, exp: exp, sign: sign} = Decimal.reduce(number)
+      {digits, _place, _sign} = to_digits(coef)
+      {digits, length(digits) + exp, sign}
+    end
   end
 
   def to_digits(integer) when is_integer(integer) when integer >= 0 do

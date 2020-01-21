@@ -36,7 +36,7 @@ defmodule Math.Test do
 
   test "rounding decimal number" do
     decimal = Decimal.new("0.1111") |> Cldr.Math.round()
-    assert Decimal.cmp(decimal, Decimal.new(0))
+    assert Decimal.equal?(decimal, Decimal.new(0))
     assert decimal.sign == 1
   end
 
@@ -52,20 +52,38 @@ defmodule Math.Test do
     end
   end
 
-  test "round significant digits for a decimal integer" do
-    decimal = Decimal.new(1234)
-    assert Math.round_significant(decimal, 2) == Decimal.reduce(Decimal.new(1200))
+  if Code.ensure_loaded?(Decimal) && function_exported?(Decimal, :normalize, 1) do
+    test "round significant digits for a decimal integer" do
+      decimal = Decimal.new(1234)
+      assert Math.round_significant(decimal, 2) == Decimal.normalize(Decimal.new(1200))
+    end
+
+    test "round significant digits for a decimal" do
+      decimal = Decimal.from_float(1234.45)
+      assert Math.round_significant(decimal, 4) == Decimal.normalize(Decimal.new(1234))
+    end
+
+    test "round significant digits for a decimal to 5 digits" do
+      decimal = Decimal.from_float(1234.45)
+      assert Math.round_significant(decimal, 5) == Decimal.normalize(Decimal.from_float(1234.5))
+    end
+  else
+    test "round significant digits for a decimal integer" do
+      decimal = Decimal.new(1234)
+      assert Math.round_significant(decimal, 2) == Decimal.reduce(Decimal.new(1200))
+    end
+
+    test "round significant digits for a decimal" do
+      decimal = Decimal.from_float(1234.45)
+      assert Math.round_significant(decimal, 4) == Decimal.reduce(Decimal.new(1234))
+    end
+
+    test "round significant digits for a decimal to 5 digits" do
+      decimal = Decimal.from_float(1234.45)
+      assert Math.round_significant(decimal, 5) == Decimal.reduce(Decimal.from_float(1234.5))
+    end
   end
 
-  test "round significant digits for a decimal" do
-    decimal = Decimal.from_float(1234.45)
-    assert Math.round_significant(decimal, 4) == Decimal.reduce(Decimal.new(1234))
-  end
-
-  test "round significant digits for a decimal to 5 digits" do
-    decimal = Decimal.from_float(1234.45)
-    assert Math.round_significant(decimal, 5) == Decimal.reduce(Decimal.from_float(1234.5))
-  end
 
   test "power of 0 == 1" do
     assert Math.power(Decimal.new(123), 0) == Decimal.new(1)
