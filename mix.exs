@@ -38,7 +38,7 @@ defmodule CldrUtils.MixProject do
 
   defp deps do
     [
-      {:decimal, "~> 1.6 or ~> 1.9.0-rc or ~> 2.0"},
+      {:decimal, "~> 1.6 or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test}
     ]
