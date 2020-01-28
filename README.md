@@ -1,6 +1,6 @@
 # Cldr Utils
 
-Utility functions extracted from [cldr](https://github.com/kipcole9/cldr)
+Utility functions extracted from [cldr](https://github.com/elixir-cldr/cldr)
 
 * Map functions for deep mapping, deep merging, transforming keys
 * Math functions including `mod/2` that works on floored division
