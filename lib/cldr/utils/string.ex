@@ -27,6 +27,19 @@ defmodule Cldr.String do
   end
 
   @doc """
+  Replaces "-" with "_" in a string
+
+  ### Example
+
+      iex> Cldr.String.to_underscore("this-one")
+      "this_one"
+
+  """
+  def to_underscore(string) when is_binary(string) do
+    String.replace(string, "-", "_")
+  end
+
+  @doc """
   This is the code of Macro.underscore with modifications:
 
   The change is to cater for strings in the format:

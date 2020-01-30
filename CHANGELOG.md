@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.7.0
+
+This is the changelog for Cldr Utils v2.6.0 released on January 31st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Add `Cldr.String.to_underscore/1` the replaces "-" with "_"
+
 ## Changelog for Cldr Utils version 2.6.0
 
 This is the changelog for Cldr Utils v2.6.0 released on January 21st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
