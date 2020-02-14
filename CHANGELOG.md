@@ -1,6 +1,14 @@
+## Changelog for Cldr Utils version 2.8.0
+
+This is the changelog for Cldr Utils v2.8.0 released on February 14th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Be more resilient of the availability of `:persistent_term` given that `get/2`, `get/1` and `:persistent_term` itself are available on different OTP releases. Thanks to @halostatue. Closes #2.
+
 ## Changelog for Cldr Utils version 2.7.0
 
-This is the changelog for Cldr Utils v2.6.0 released on January 31st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.7.0 released on January 31st, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
