@@ -33,7 +33,8 @@ defmodule Cldr.Macros do
 
       missing? =
         if function_exported?(:persistent_term, :get, 2) do
-          :persistent_term.get(ck, true)
+          apply(:persistent_term, :get, [ck, true])
+          # :persistent_term.get(ck, true)
         else
           try do
             :persistent_term.get(ck)
