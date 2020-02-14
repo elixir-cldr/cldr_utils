@@ -11,6 +11,7 @@ defmodule Cldr.Helpers do
         :persistent_term.get(key, default)
       end
 
+      @doc false
       def put_term(key, value) do
         :persistent_term.put(key, value)
       end
@@ -23,14 +24,17 @@ defmodule Cldr.Helpers do
          default
        end
 
+       @doc false
        def put_term(key, value) do
          :persistent_term.put(key, value)
        end
     true ->
+      @doc false
       def get_term(_key, default) do
         default
       end
 
+      @doc false
       def put_term(key, value) do
         value
       end
