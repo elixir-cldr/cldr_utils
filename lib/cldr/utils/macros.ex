@@ -29,9 +29,22 @@ defmodule Cldr.Macros do
     quote do
       require Logger
 
-      if :persistent_term.get({unquote(caller), unquote(key)}, true) do
+      ck = {unquote(caller), unquote(key)}
+
+      missing? =
+        if function_exported?(:persistent_term, :get, 2) do
+          :persistent_term.get(ck, true)
+        else
+          try do
+            :persistent_term.get(ck)
+          rescue
+            ArgumentError -> true
+          end
+        end
+
+      if missing? do
         Logger.unquote(level)(unquote(message))
-        :persistent_term.put({unquote(caller), unquote(key)}, nil)
+        :persistent_term.put(ck, nil)
       end
     end
   end
