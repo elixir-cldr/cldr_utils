@@ -1,4 +1,15 @@
 defmodule Cldr.Helpers do
+  @moduledoc """
+  General purpose helper functions for CLDR
+  """
+
+  @doc """
+  Returns a boolean indicating if a data
+  structure is semanically empty.
+
+  Applies to lists, maps and `nil`
+  """
+
   def empty?([]), do: true
   def empty?(%{} = map) when map == %{}, do: true
   def empty?(nil), do: true
