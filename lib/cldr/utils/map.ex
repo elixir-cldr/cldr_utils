@@ -42,7 +42,8 @@ defmodule Cldr.Map do
     %{a: "A", b: %{c: "C"}}
 
   """
-  @spec deep_map(map(), function :: function(), options :: list() | map()) :: map()
+  @spec deep_map(map() | list(), function :: function() | {function(), function()}, options :: list() | map()) ::
+    map() | list()
 
   def deep_map(map, function, options \\ @default_deep_map_options)
 
@@ -53,7 +54,7 @@ defmodule Cldr.Map do
   end
 
   def deep_map(map, function, options)
-      when is_map(map) and is_function(function) and is_list(options) do
+      when is_map(map) and is_list(options) do
     options =
       @default_deep_map_options ++ options
       |> Map.new()
@@ -72,7 +73,7 @@ defmodule Cldr.Map do
   end
 
   defp deep_map(map, function, %{level: %{first: first}} = options, level)
-      when is_map(map) and level < first do
+      when is_map(map) and is_function(function) and level < first do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
         {k, deep_map(v, function, options, level + 1)}
@@ -83,7 +84,7 @@ defmodule Cldr.Map do
     |> Map.new
   end
 
-  defp deep_map(map, function, options, level) when is_map(map) do
+  defp deep_map(map, function, options, level) when is_map(map) and is_function(function) do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
         function.({k, deep_map(v, function, options, level + 1)})
@@ -95,7 +96,7 @@ defmodule Cldr.Map do
   end
 
   defp deep_map([head | rest], function, %{level: %{first: first, end: last}} = options, level)
-      when level >= first and level <= last do
+      when is_function(function) and level >= first and level <= last do
     [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
   end
 
@@ -103,61 +104,44 @@ defmodule Cldr.Map do
     nil
   end
 
-  defp deep_map(value, function, options, level) do
+  defp deep_map(value, function, _options, _level) when is_function(function) do
     function.(value)
   end
 
-  @doc """
-  Recursively traverse a map and invoke a function for each key
-  and a function for each value that transform the map.
+  defp deep_map(map_or_list, {_key_function, _value_function}, %{level: %{last: last}}, level)
+      when level > last do
+    map_or_list
+  end
 
-  * `map` is any `t:map/0`
+  defp deep_map(map, {key_function, value_function}, %{level: %{first: first}} = options, level)
+      when is_map(map) and level < first do
+    Enum.map(map, fn
+      {k, v} when is_map(v) or is_list(v) ->
+        {key_function.(k), deep_map(v, {key_function, value_function}, options, level + 1)}
 
-  * `key_function` is a function or function reference that
-    is called for each key of the provided map and any keys
-    of any submaps
+      {k, v} ->
+        {key_function.(k), value_function.(v)}
+    end)
+    |> Map.new
+  end
 
-  * `value_function` is a function or function reference that
-    is called for each value of the provided map and any values
-    of any submaps
+  defp deep_map(map, {key_function, value_function}, options, level) when is_map(map) do
+    Enum.map(map, fn
+      {k, v} when is_map(v) or is_list(v) ->
+        {key_function.(k), deep_map(v, {key_function, value_function}, options, level + 1)}
 
-  Returns:
+      {k, v} ->
+        {key_function.(k), value_function.(v)}
+    end)
+    |> Map.new
+  end
 
-  * The `map` transformed by the recursive application of `key_function`
-    and `value_function`
+  defp deep_map([head | rest], {key_function, value_function}, options, level) do
+    [deep_map(head, {key_function, value_function}, options, level + 1) |
+     deep_map(rest, {key_function, value_function}, options, level + 1)]
+  end
 
-  ## Examples
-
-  """
-  # @spec deep_map(term(), key_function :: function(), value_function :: function()) :: term()
-  # def deep_map(map, key_function, value_function)
-  #
-  # # Don't deep map structs since they have atom keys anyway and they
-  # # also don't support enumerable
-  # def deep_map(%_struct{} = map, _key_function, _value_function) when is_map(map) do
-  #   map
-  # end
-  #
-  # def deep_map(map, key_function, value_function) when is_map(map) do
-  #   Enum.map(map, fn
-  #     {k, v} when is_map(v) or is_list(v) ->
-  #       {key_function.(k), deep_map(v, key_function, value_function)}
-  #
-  #     {k, v} ->
-  #       {key_function.(k), value_function.(v)}
-  #   end)
-  #   |> Map.new
-  # end
-  #
-  # def deep_map([head | rest], key_function, value_function) do
-  #   [deep_map(head, key_function, value_function) | deep_map(rest, key_function, value_function)]
-  # end
-  #
-  # def deep_map(nil, _key_funtion, _value_funtion) do
-  #   nil
-  # end
-  #
-  # def deep_map(value, _key_function, value_function) do
+  # defp deep_map(value, {_key_function, value_function}, _options, _level) do
   #   value_function.(value)
   # end
 
@@ -329,7 +313,7 @@ defmodule Cldr.Map do
 
   """
   def underscore_keys(map) when is_map(map) or is_nil(map) do
-    deep_map(map, &underscore/1)
+    deep_map(map, {&underscore/1, &identity/1})
   end
 
   @doc """
@@ -342,7 +326,7 @@ defmodule Cldr.Map do
 
   """
   def remove_leading_underscores(map) do
-    deep_map(map, &String.replace_prefix(&1, "_", ""), &identity/1)
+    deep_map(map, {&String.replace_prefix(&1, "_", ""), &identity/1})
   end
 
   @doc """
@@ -452,7 +436,7 @@ defmodule Cldr.Map do
 
   defp atomize_key({k, v}, %{only_existing: false} = options) when is_binary(k) do
     if process_element?(k, options) do
-      {String.to_atom(k), v} |> IO.inspect(label: "atomize_key returning")
+      {String.to_atom(k), v}
     else
       {k, v}
     end
