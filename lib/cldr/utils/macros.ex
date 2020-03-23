@@ -29,9 +29,9 @@ defmodule Cldr.Macros do
     quote do
       require Logger
 
-      if :persistent_term.get({unquote(caller), unquote(key)}, true) do
+      if Cldr.Helpers.get_term({unquote(caller), unquote(key)}, true) do
         Logger.unquote(level)(unquote(message))
-        :persistent_term.put({unquote(caller), unquote(key)}, nil)
+        Cldr.Helpers.put_term({unquote(caller), unquote(key)}, nil)
       end
     end
   end
