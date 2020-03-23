@@ -47,10 +47,30 @@ defmodule Support.Map.Test do
 
     assert Cldr.Map.atomize_keys(test_map, only: "nested") == test_result
     assert Cldr.Map.atomize_keys(test_map, only: ["nested"]) == test_result
-    assert Cldr.Map.atomize_keys(test_map, only: &(&1 == "nested")) == test_result
+    assert Cldr.Map.atomize_keys(test_map, only: &(elem(&1,0) == "nested")) == test_result
 
     assert Cldr.Map.atomize_keys(test_map, except: "key") == test_result
     assert Cldr.Map.atomize_keys(test_map, except: ["key"]) == test_result
-    assert Cldr.Map.atomize_keys(test_map, except: &(&1 == "key")) == test_result
+    assert Cldr.Map.atomize_keys(test_map, except: &(elem(&1, 0) == "key")) == test_result
+  end
+
+  test "atomizing values when the value is a list" do
+    assert Cldr.Map.atomize_values(%{"key" => ["a", "b", "c"]}) == %{"key" => [:a, :b, :c]}
+  end
+
+  test "deep_map with levels" do
+    test_map = %{
+      "key" => %{
+        "nested" => "value"
+      }
+    }
+
+    test_result = %{
+      key: %{
+        "nested" => "value"
+      }
+    }
+
+    assert Cldr.Map.atomize_keys(test_map, level: 1..1) == test_result
   end
 end

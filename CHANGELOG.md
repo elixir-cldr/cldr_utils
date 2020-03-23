@@ -1,3 +1,13 @@
+## Changelog for Cldr Utils version 2.9.0
+
+This is the changelog for Cldr Utils v2.9.0 released on _______, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Adds `:only` and `:except` options to `Cldr.Map.atomize_keys/3`, `Cldr.Map.atomize_values/3`, `Cldr.Map.integerize_keys/3` and `Cldr.Map.integerize_values/3`
+
+* Adds `:level` option to `Cldr.Map.deep_merge/3`
+
 ## Changelog for Cldr Utils version 2.8.0
 
 This is the changelog for Cldr Utils v2.8.0 released on February 14th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
