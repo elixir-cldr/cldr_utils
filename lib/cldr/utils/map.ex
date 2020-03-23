@@ -3,6 +3,10 @@ defmodule Cldr.Map do
   Functions for transforming maps, keys and values.
   """
 
+  @default_deep_map_options [level: 1..1_000_000]
+  @starting_level 1
+  @max_level 1_000_000
+
   @doc """
   Recursively traverse a map and invoke a function for each key/
   value pair that transforms the map.
@@ -14,6 +18,15 @@ defmodule Cldr.Map do
   * `function` is a function or function reference that
     is called for each key/value pair of the provided map
 
+  * `options` is a keyword list of options
+
+  ## Options
+
+  * `:levels` indicates the starting and ending levels of
+    the map at which the `function` is executed. This can
+    be an integer representing a single level or a range
+    indicating a range of levels. The default is `1..#{@max_level}`
+
   ## Returns
 
   * The `map` transformed by the recursive application of
@@ -22,41 +35,76 @@ defmodule Cldr.Map do
   ## Example
 
     iex> map = %{a: "a", b: %{c: "c"}}
-    iex> Cldr.Map.deep_map map, fn {k, v} ->
-    ...>   {k, String.upcase(v)}
+    iex> Cldr.Map.deep_map map, fn
+    ...>   {k, v} when is_binary(v) -> {k, String.upcase(v)}
+    ...>   other -> other
     ...> end
     %{a: "A", b: %{c: "C"}}
 
   """
-  @spec deep_map(map(), function :: function()) :: map()
+  @spec deep_map(map(), function :: function(), options :: list() | map()) :: map()
+
+  def deep_map(map, function, options \\ @default_deep_map_options)
 
   # Don't deep map structs since they have atom keys anyway and they
   # also don't support enumerable
-  def deep_map(%_struct{} = map, _function) when is_map(map) do
+  def deep_map(%_struct{} = map, _function, _options) when is_map(map) do
     map
   end
 
-  def deep_map(map, function) when is_map(map) do
+  def deep_map(map, function, options)
+      when is_map(map) and is_function(function) and is_list(options) do
+    options =
+      @default_deep_map_options ++ options
+      |> Map.new()
+      |> Map.update!(:level, fn
+        level when is_integer(level) -> level..@max_level
+        %Range{} = level -> level
+        other -> raise ArgumentError, "Level must be an integer or a range. Found #{inspect other}"
+      end)
+
+    deep_map(map, function, options, @starting_level)
+  end
+
+  defp deep_map(map_or_list, _function, %{level: %{last: last}}, level)
+      when level > last do
+    map_or_list
+  end
+
+  defp deep_map(map, function, %{level: %{first: first}} = options, level)
+      when is_map(map) and level < first do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
-        {k, deep_map(v, function)}
+        {k, deep_map(v, function, options, level + 1)}
+
+      {k, v} ->
+        {k, v}
+    end)
+    |> Map.new
+  end
+
+  defp deep_map(map, function, options, level) when is_map(map) do
+    Enum.map(map, fn
+      {k, v} when is_map(v) or is_list(v) ->
+        function.({k, deep_map(v, function, options, level + 1)})
 
       {k, v} ->
         function.({k, v})
     end)
-    |> Enum.into(%{})
+    |> Map.new
   end
 
-  def deep_map([head | rest], fun) do
-    [deep_map(head, fun) | deep_map(rest, fun)]
+  defp deep_map([head | rest], function, %{level: %{first: first, end: last}} = options, level)
+      when level >= first and level <= last do
+    [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
   end
 
-  def deep_map(nil, _fun) do
+  defp deep_map(nil, _fun, _options, _level) do
     nil
   end
 
-  def deep_map(value, fun) do
-    fun.(value)
+  defp deep_map(value, function, options, level) do
+    function.(value)
   end
 
   @doc """
@@ -81,37 +129,37 @@ defmodule Cldr.Map do
   ## Examples
 
   """
-  @spec deep_map(term(), key_function :: function(), value_function :: function()) :: term()
-  def deep_map(map, key_function, value_function)
-
-  # Don't deep map structs since they have atom keys anyway and they
-  # also don't support enumerable
-  def deep_map(%_struct{} = map, _key_function, _value_function) when is_map(map) do
-    map
-  end
-
-  def deep_map(map, key_function, value_function) when is_map(map) do
-    Enum.map(map, fn
-      {k, v} when is_map(v) or is_list(v) ->
-        {key_function.(k), deep_map(v, key_function, value_function)}
-
-      {k, v} ->
-        {key_function.(k), value_function.(v)}
-    end)
-    |> Enum.into(%{})
-  end
-
-  def deep_map([head | rest], key_fun, value_fun) do
-    [deep_map(head, key_fun, value_fun) | deep_map(rest, key_fun, value_fun)]
-  end
-
-  def deep_map(nil, _key_fun, _value_fun) do
-    nil
-  end
-
-  def deep_map(value, _key_fun, value_fun) do
-    value_fun.(value)
-  end
+  # @spec deep_map(term(), key_function :: function(), value_function :: function()) :: term()
+  # def deep_map(map, key_function, value_function)
+  #
+  # # Don't deep map structs since they have atom keys anyway and they
+  # # also don't support enumerable
+  # def deep_map(%_struct{} = map, _key_function, _value_function) when is_map(map) do
+  #   map
+  # end
+  #
+  # def deep_map(map, key_function, value_function) when is_map(map) do
+  #   Enum.map(map, fn
+  #     {k, v} when is_map(v) or is_list(v) ->
+  #       {key_function.(k), deep_map(v, key_function, value_function)}
+  #
+  #     {k, v} ->
+  #       {key_function.(k), value_function.(v)}
+  #   end)
+  #   |> Map.new
+  # end
+  #
+  # def deep_map([head | rest], key_function, value_function) do
+  #   [deep_map(head, key_function, value_function) | deep_map(rest, key_function, value_function)]
+  # end
+  #
+  # def deep_map(nil, _key_funtion, _value_funtion) do
+  #   nil
+  # end
+  #
+  # def deep_map(value, _key_function, value_function) do
+  #   value_function.(value)
+  # end
 
   @doc """
   Transforms a `map`'s `String.t` keys to `atom()` keys.
@@ -128,8 +176,10 @@ defmodule Cldr.Map do
   ## Examples
 
   """
-  def atomize_keys(map, options \\ [only_existing: false]) do
-    deep_map(map, &atomize_element(&1, options[:only_existing]), &identity/1)
+  @default_atomize_options [only_existing: false]
+  def atomize_keys(map, options \\ []) do
+    options = (@default_atomize_options ++ options) |> Map.new
+    deep_map(map, &atomize_key(&1, options))
   end
 
   @doc """
@@ -148,7 +198,8 @@ defmodule Cldr.Map do
 
   """
   def atomize_values(map, options \\ [only_existing: false]) do
-    deep_map(map, &identity/1, &atomize_element(&1, options[:only_existing]))
+    options = (@default_atomize_options ++ options) |> Map.new
+    deep_map(map, &atomize_value(&1, options))
   end
 
   @doc """
@@ -186,7 +237,7 @@ defmodule Cldr.Map do
 
   """
   def integerize_keys(map) do
-    deep_map(map, &integerize_element/1, &identity/1)
+    deep_map(map, &integerize_key/1)
   end
 
   @doc """
@@ -205,7 +256,26 @@ defmodule Cldr.Map do
 
   """
   def integerize_values(map) do
-    deep_map(map, &identity/1, &integerize_element/1)
+    deep_map(map, &integerize_value/1)
+  end
+
+  @doc """
+  Transforms a `map`'s keys to `Float.t` values.
+
+  * `map` is any `t:map/0`
+
+  The map key is converted to a `float` from
+  either an `atom` or `String.t` only when the
+  key is comprised of a valid float form.
+
+  Keys which cannot be converted to a `float`
+  are returned unchanged.
+
+  ## Examples
+
+  """
+  def floatize_keys(map) do
+    deep_map(map, &floatize_key/1)
   end
 
   @doc """
@@ -215,16 +285,16 @@ defmodule Cldr.Map do
 
   The map value is converted to a `float` from
   either an `atom` or `String.t` only when the
-  value is comprised of a valid float forma.
+  value is comprised of a valid float form.
 
-  Keys which cannot be converted to a `float`
+  Values which cannot be converted to a `float`
   are returned unchanged.
 
   ## Examples
 
   """
   def floatize_values(map) do
-    deep_map(map, &identity/1, &floatize_element/1)
+    deep_map(map, &floatize_value/1)
   end
 
   @doc """
@@ -259,7 +329,7 @@ defmodule Cldr.Map do
 
   """
   def underscore_keys(map) when is_map(map) or is_nil(map) do
-    deep_map(map, &underscore/1, &identity/1)
+    deep_map(map, &underscore/1)
   end
 
   @doc """
@@ -368,63 +438,170 @@ defmodule Cldr.Map do
 
   defp identity(x), do: x
 
-  defp atomize_element(x, true) when is_binary(x) do
-    String.to_existing_atom(x)
+  defp atomize_key({k, v}, %{only_existing: true} = options) when is_binary(k) do
+    if process_element?(k, options) do
+      {String.to_existing_atom(k), v}
+    else
+      {k, v}
+    end
+
   rescue
     ArgumentError ->
-      x
+      {k, v}
   end
 
-  defp atomize_element(x, false) when is_binary(x) do
-    String.to_atom(x)
+  defp atomize_key({k, v}, %{only_existing: false} = options) when is_binary(k) do
+    if process_element?(k, options) do
+      {String.to_atom(k), v} |> IO.inspect(label: "atomize_key returning")
+    else
+      {k, v}
+    end
   end
 
-  defp atomize_element(x, _) do
+  defp atomize_key(x, _) do
     x
   end
 
+  defp atomize_value({k, v}, %{only_existing: true} = options) when is_binary(v) do
+    if process_element?(k, options) do
+      {k, String.to_existing_atom(v)}
+    else
+      {k, v}
+    end
+
+  rescue
+    ArgumentError ->
+      {k, v}
+  end
+
+  defp atomize_value({k, v}, %{only_existing: false} = options) when is_binary(v) do
+    if process_element?(k, options) do
+      {k, String.to_atom(v)}
+    else
+      {k, v}
+    end
+  end
+
+  defp atomize_value(x, _) do
+    x
+  end
+
+  defp process_element?(x, options) do
+    only = Map.get(options, :only, []) |> maybe_wrap
+    except = Map.get(options, :except, []) |> maybe_wrap
+    process_element?(x, only, except)
+  end
+
+  def maybe_wrap(element) when is_list(element) do
+    element
+  end
+
+  def maybe_wrap(element) do
+    [element]
+  end
+
+  # process_element?/2 determines whether the
+  # calling function should apply to a given
+  # value
+  defp process_element?(_x, [], []) do
+    true
+  end
+
+  defp process_element?(x, [], [except]) when is_function(except) do
+    !except.(x)
+  end
+
+  defp process_element?(x, [], except) do
+    x not in except
+  end
+
+  defp process_element?(x, [only], []) when is_function(only) do
+    only.(x)
+  end
+
+  defp process_element?(x, only, []) do
+    x in only
+  end
+
+  defp process_element?(x, [only], [except]) when is_function(only) and is_function(except) do
+    only.(x) && not except.(x)
+  end
+
+  defp process_element?(x, [only], except) when is_function(only) do
+    only.(x) && x not in except
+  end
+
+  defp process_element?(x, only, [except]) when is_function(except) do
+   x in only && !except.(x)
+  end
+
+  defp process_element?(x, only, except) do
+    x in only and x not in except
+  end
+
   @integer_reg Regex.compile!("^-?[0-9]+$")
-  defp integerize_element(x) when is_atom(x) do
-    integer =
-      x
-      |> Atom.to_string()
-      |> integerize_element
+  defp integerize_key({k, v}) when is_atom(k) do
+    integerize_key({Atom.to_string(k), v})
+  end
 
-    if is_integer(integer) do
-      integer
+  defp integerize_key({k, v}) when is_binary(k) do
+    if Regex.match?(@integer_reg, k) do
+      {String.to_integer(k), v}
     else
-      x
+      {k, v}
     end
   end
 
-  defp integerize_element(x) when is_binary(x) do
-    if Regex.match?(@integer_reg, x) do
-      String.to_integer(x)
+  defp integerize_key(x) do
+    x
+  end
+
+  defp integerize_value({k, v}) when is_atom(k) do
+    integerize_value({k, Atom.to_string(v)})
+  end
+
+  defp integerize_value({k, v}) when is_binary(k) do
+    if Regex.match?(@integer_reg, v) do
+      {k, String.to_integer(v)}
     else
-      x
+      {k, v}
     end
   end
 
-  defp integerize_element(x) do
+  defp integerize_value(x) do
     x
   end
 
   @float_reg Regex.compile!("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$")
-  defp floatize_element(x) when is_atom(x) do
-    x
-    |> Atom.to_string()
-    |> floatize_element
+  defp floatize_key({k, v}) when is_atom(k) do
+    floatize_key({Atom.to_string(k), v})
   end
 
-  defp floatize_element(x) when is_binary(x) do
-    if Regex.match?(@float_reg, x) do
-      String.to_float(x)
+  defp floatize_key({k, v}) when is_binary(k) do
+    if Regex.match?(@float_reg, k) do
+      {String.to_float(k), v}
     else
-      x
+      {k, v}
     end
   end
 
-  defp floatize_element(x) do
+  defp floatize_key(x) do
+    x
+  end
+
+  defp floatize_value({k, v}) when is_atom(v) do
+    floatize_value({k, Atom.to_string(v)})
+  end
+
+  defp floatize_value({k, v}) when is_binary(v) do
+    if Regex.match?(@float_reg, v) do
+      {k, String.to_float(v)}
+    else
+      {k, v}
+    end
+  end
+
+  defp floatize_value(x) do
     x
   end
 
