@@ -1,7 +1,7 @@
 defmodule CldrUtils.MixProject do
   use Mix.Project
 
-  @version "2.9.0"
+  @version "2.9.0-dev"
 
   def project do
     [
@@ -18,7 +18,7 @@ defmodule CldrUtils.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
-        plt_add_apps: ~w(gettext inets jason mix poison plug)a
+        plt_add_apps: ~w(inets)a
       ],
       compilers: Mix.compilers()
     ]
@@ -40,7 +40,8 @@ defmodule CldrUtils.MixProject do
     [
       {:decimal, "~> 1.6 or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
-      {:stream_data, "~> 0.4", only: :test}
+      {:stream_data, "~> 0.4", only: :test},
+      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false}
     ]
   end
 
