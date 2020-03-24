@@ -103,10 +103,10 @@ defmodule Cldr.Map do
   defp deep_map(map, function, options, level) when is_map(map) and is_function(function) do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
-        function.({k, deep_map(v, function, options, level + 1)})
+        maybe_execute(function, {k, deep_map(v, function, options, level + 1)}, options)
 
       {k, v} ->
-        function.({k, v})
+        maybe_execute(function, {k, v}, options)
     end)
     |> Map.new
   end
@@ -114,10 +114,11 @@ defmodule Cldr.Map do
   defp deep_map(map, {key_function, value_function}, options, level) when is_map(map) do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
-        {key_function.(k), deep_map(v, {key_function, value_function}, options, level + 1)}
+        {maybe_execute(key_function, k, options),
+          deep_map(v, {key_function, value_function}, options, level + 1)}
 
       {k, v} ->
-        {key_function.(k), value_function.(v)}
+        {maybe_execute(key_function, k, options), maybe_execute(value_function, v, options)}
     end)
     |> Map.new
   end
@@ -131,12 +132,20 @@ defmodule Cldr.Map do
      deep_map(rest, {key_function, value_function}, options, level + 1)]
   end
 
-  defp deep_map(value, function, _options, _level) when is_function(function) do
-    function.(value)
+  defp deep_map(value, function, options, _level) when is_function(function) do
+    maybe_execute(function, value, options)
   end
 
-  defp deep_map(value, {_key_function, value_function}, _options, _level) do
-    value_function.(value)
+  defp deep_map(value, {_key_function, value_function}, options, _level) do
+    maybe_execute(value_function, value, options)
+  end
+
+  defp maybe_execute(function, value, options) do
+    if process_element?(value, options) do
+      function.(value)
+    else
+      value
+    end
   end
 
   @doc """
@@ -215,7 +224,7 @@ defmodule Cldr.Map do
 
   """
   def integerize_keys(map, options \\ []) do
-    deep_map(map, &integerize_key(&1, Map.new(options)), options)
+    deep_map(map, &integerize_key/1, options)
   end
 
   @doc """
@@ -234,7 +243,7 @@ defmodule Cldr.Map do
 
   """
   def integerize_values(map, options \\ []) do
-    deep_map(map, &integerize_value(&1, Map.new(options)), options)
+    deep_map(map, &integerize_value/1, options)
   end
 
   @doc """
@@ -252,8 +261,8 @@ defmodule Cldr.Map do
   ## Examples
 
   """
-  def floatize_keys(map) do
-    deep_map(map, &floatize_key/1)
+  def floatize_keys(map, options \\ []) do
+    deep_map(map, &floatize_key/1, options)
   end
 
   @doc """
@@ -271,8 +280,8 @@ defmodule Cldr.Map do
   ## Examples
 
   """
-  def floatize_values(map) do
-    deep_map(map, &floatize_value/1)
+  def floatize_values(map, options \\ []) do
+    deep_map(map, &floatize_value/1, options)
   end
 
   @doc """
@@ -307,7 +316,7 @@ defmodule Cldr.Map do
 
   """
   def underscore_keys(map, options \\ []) when is_map(map) or is_nil(map) do
-    deep_map(map, &underscore_key(&1, Map.new(options)), options)
+    deep_map(map, &underscore_key/1, options)
   end
 
   @doc """
@@ -416,101 +425,77 @@ defmodule Cldr.Map do
 
   defp identity(x), do: x
 
-  defp atomize_key({k, v}, %{only_existing: true} = options) when is_binary(k) do
-    if process_element?({k, v}, options) do
-      {String.to_existing_atom(k), v}
-    else
-      {k, v}
-    end
-
+  defp atomize_key({k, v}, %{only_existing: true}) when is_binary(k) do
+    {String.to_existing_atom(k), v}
   rescue
-    ArgumentError ->
-      {k, v}
+    ArgumentError -> {k, v}
   end
 
-  defp atomize_key({k, v}, %{only_existing: false} = options) when is_binary(k) do
-    if process_element?({k, v}, options) do
-      {String.to_atom(k), v}
-    else
-      {k, v}
-    end
+  defp atomize_key({k, v}, %{only_existing: false}) when is_binary(k) do
+    {String.to_atom(k), v}
   end
 
   defp atomize_key(x, _options) do
     x
   end
 
-  def atomize_value({k, v}, %{only_existing: true} = options) when is_binary(v) do
-    if process_element?({k, v}, options) do
-      {k, String.to_existing_atom(v)}
-    else
-      {k, v}
-    end
-
+  def atomize_value({k, v}, %{only_existing: true}) when is_binary(v) do
+    {k, String.to_existing_atom(v)}
   rescue
-    ArgumentError ->
-      {k, v}
+    ArgumentError -> {k, v}
   end
 
-  def atomize_value({k, v}, %{only_existing: false} = options) when is_binary(v) do
-    if process_element?({k, v}, options) do
-      {k, String.to_atom(v)}
-    else
-      {k, v}
-    end
+  def atomize_value({k, v}, %{only_existing: false}) when is_binary(v) do
+    {k, String.to_atom(v)}
   end
 
   def atomize_value(v, %{only_existing: false}) when is_binary(v) do
     String.to_atom(v)
   end
 
-  def atomize_value(x, _) do
+  def atomize_value(x, _options) do
     x
   end
 
   @integer_reg Regex.compile!("^-?[0-9]+$")
-  defp integerize_key({k, v}, options) when is_binary(k) do
-    if process_element?(k, options) && Regex.match?(@integer_reg, k) do
+  defp integerize_key({k, v}) when is_binary(k) do
+    if Regex.match?(@integer_reg, k) do
       {String.to_integer(k), v}
     else
       {k, v}
     end
   end
 
-  defp integerize_key(x, _options) do
+  defp integerize_key(x) do
     x
   end
 
-  defp integerize_value({k, v}, options) when is_atom(v) do
-    integerize_value({k, Atom.to_string(v)}, options)
+  defp integerize_value({k, v}) when is_atom(v) do
+    integerize_value({k, Atom.to_string(v)})
   end
 
-  defp integerize_value({k, v}, options) when is_binary(v) do
-    if process_element?(k, options) && Regex.match?(@integer_reg, v) do
+  defp integerize_value({k, v}) when is_binary(v) do
+    if Regex.match?(@integer_reg, v) do
       {k, String.to_integer(v)}
     else
       {k, v}
     end
   end
 
-  defp integerize_value(x, _options) do
+  defp integerize_value(x) do
     x
   end
 
-  defp underscore_key({k, v}, options) when is_atom(k) do
+  defp underscore_key({k, v}) when is_atom(k) do
     {Atom.to_string(k), v}
-    |> underscore_key(options)
+    |> underscore_key()
   end
 
-  defp underscore_key({k, v}, options) when is_binary(k) do
-    if process_element?(k, options) do
-      {underscore(k, options), v}
-    else
-      {k, v}
-    end
+  defp underscore_key({k, v}) when is_binary(k) do
+    {underscore(k), v}
   end
 
-  defp underscore_key(x, _options) do
+  defp underscore_key(x) do
     x
   end
 
@@ -520,11 +505,7 @@ defmodule Cldr.Map do
   end
 
   defp floatize_key({k, v}) when is_binary(k) do
-    if Regex.match?(@float_reg, k) do
-      {String.to_float(k), v}
-    else
-      {k, v}
-    end
+    {String.to_float(k), v}
   end
 
   defp floatize_key(x) do
@@ -622,51 +603,49 @@ defmodule Cldr.Map do
   ## Examples
 
   """
-  @spec underscore(string :: String.t() | atom(), options :: map()) :: String.t()
-  def underscore(atom, options) when is_atom(atom) do
+  @spec underscore(string :: String.t() | atom()) :: String.t()
+  def underscore(atom) when is_atom(atom) do
     "Elixir." <> rest = Atom.to_string(atom)
-    underscore(rest, options)
+    underscore(rest)
   end
 
-  def underscore(<<h, t::binary>> = string, options) do
-    if process_element?(string, options) do
-      <<to_lower_char(h)>> <> do_underscore(t, h, options)
-    end
+  def underscore(<<h, t::binary>>) do
+    <<to_lower_char(h)>> <> do_underscore(t, h)
   end
 
-  def underscore("", _options) do
+  def underscore("") do
     ""
   end
 
   # h is upper case, next char is not uppercase, or a _ or .  => and prev != _
-  defp do_underscore(<<h, t, rest::binary>>, prev, options)
+  defp do_underscore(<<h, t, rest::binary>>, prev)
        when h >= ?A and h <= ?Z and not (t >= ?A and t <= ?Z) and t != ?. and t != ?_ and t != ?- and
               prev != ?_ do
-    <<?_, to_lower_char(h), t>> <> do_underscore(rest, t, options)
+    <<?_, to_lower_char(h), t>> <> do_underscore(rest, t)
   end
 
   # h is uppercase, previous was not uppercase or _
-  defp do_underscore(<<h, t::binary>>, prev, options)
+  defp do_underscore(<<h, t::binary>>, prev)
        when h >= ?A and h <= ?Z and not (prev >= ?A and prev <= ?Z) and prev != ?_ do
-    <<?_, to_lower_char(h)>> <> do_underscore(t, h, options)
+    <<?_, to_lower_char(h)>> <> do_underscore(t, h)
   end
 
   # h is dash "-" -> replace with underscore "_"
-  defp do_underscore(<<?-, t::binary>>, _, options) do
-    <<?_>> <> underscore(t, options)
+  defp do_underscore(<<?-, t::binary>>, _) do
+    <<?_>> <> underscore(t)
   end
 
   # h is .
-  defp do_underscore(<<?., t::binary>>, _, options) do
-    <<?/>> <> underscore(t, options)
+  defp do_underscore(<<?., t::binary>>, _) do
+    <<?/>> <> underscore(t)
   end
 
   # Any other char
-  defp do_underscore(<<h, t::binary>>, _, options) do
-    <<to_lower_char(h)>> <> do_underscore(t, h, options)
+  defp do_underscore(<<h, t::binary>>, _) do
+    <<to_lower_char(h)>> <> do_underscore(t, h)
   end
 
-  defp do_underscore(<<>>, _, _) do
+  defp do_underscore(<<>>, _) do
     <<>>
   end
 
