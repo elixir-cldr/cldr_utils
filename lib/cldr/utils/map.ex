@@ -26,8 +26,13 @@ defmodule Cldr.Map do
   * `function` is a `1-arity` function or function reference that
     is called for each key/value pair of the provided map. It can
     also be a 2-tuple of the form `{key_function, value_function}`
-    in which the `key_function` is called with each key and the
-    `value_function` is called with each value.
+
+    * In the case where `function` is a single function it will be
+      called with the 2-tuple argument `{key, value}`
+
+    * In the case where function is of the form `{key_function, value_function}`
+      the `key_function` will be called with the argument `key` and the value
+      function will be called with the argument `value`
 
   * `options` is a keyword list of options. The default is `[]`
 
@@ -62,14 +67,22 @@ defmodule Cldr.Map do
   * The `map` transformed by the recursive application of
     `function`
 
-  ## Example
+  ## Examples
 
-    iex> map = %{a: "a", b: %{c: "c"}}
-    iex> Cldr.Map.deep_map map, fn
-    ...>   {k, v} when is_binary(v) -> {k, String.upcase(v)}
+    iex> map = %{a: :a, b: %{c: :c}}
+    iex> fun = fn
+    ...>   {k, v} when is_atom(k) -> {Atom.to_string(k), v}
     ...>   other -> other
     ...> end
-    %{a: "A", b: %{c: "C"}}
+    iex> Cldr.Map.deep_map map, fun
+    %{"a" => :a, "b" => %{"c" => :c}}
+    iex> map = %{a: :a, b: %{c: :c}}
+    iex> Cldr.Map.deep_map map, fun, only: :c
+    %{a: :a, b: %{"c" => :c}}
+    iex> Cldr.Map.deep_map map, fun, except: [:a, :b]
+    %{a: :a, b: %{"c" => :c}}
+    iex> Cldr.Map.deep_map map, fun, level: 2
+    %{a: :a, b: %{"c" => :c}}
 
   """
   @spec deep_map(
@@ -183,7 +196,7 @@ defmodule Cldr.Map do
       only convert the binary value to an atom if the atom
       already exists.  The default is `false`.
 
-  ## Examples
+  ## Example
 
     iex> Cldr.Map.atomize_keys %{"a" => %{"b" => %{1 => "c"}}}
     %{a: %{b: %{1 => "c"}}}
@@ -238,7 +251,7 @@ defmodule Cldr.Map do
   Keys which cannot be converted to an `integer`
   are returned unchanged.
 
-  ## Examples
+  ## Example
 
       iex> Cldr.Map.integerize_keys %{a: %{"1" => "value"}}
       %{a: %{1 => "value"}}
@@ -265,7 +278,7 @@ defmodule Cldr.Map do
   Keys which cannot be converted to an integer
   are returned unchanged.
 
-  ## Examples
+  ## Example
 
     iex> Cldr.Map.integerize_values %{a: %{b: "1"}}
     %{a: %{b: 1}}
@@ -345,7 +358,7 @@ defmodule Cldr.Map do
   * `options` is a keyword list of options passed
     to `deep_map/3`
 
-  ## Examples
+  ## Example
 
     iex> Cldr.Map.stringify_keys %{a: %{"1" => "value"}}
     %{"a" => %{"1" => "value"}}
@@ -363,7 +376,7 @@ defmodule Cldr.Map do
   * `options` is a keyword list of options passed
     to `deep_map/3`
 
-  ## Examples
+  ## Example
 
     iex> Cldr.Map.underscore_keys %{"a" => %{"thisOne" => "value"}}
     %{"a" => %{"this_one" => "value"}}
@@ -385,7 +398,7 @@ defmodule Cldr.Map do
   * `options` is a keyword list of options passed
     to `deep_map/3`
 
-  ## Examples
+  ## Example
 
     iex> Cldr.Map.rename_keys %{"a" => %{"this_one" => "value"}}, "this_one", "that_one"
     %{"a" => %{"that_one" => "value"}}
@@ -484,8 +497,11 @@ defmodule Cldr.Map do
 
   ## Examples
 
+    iex> Cldr.Map.remove_leading_underscores %{"a" => %{"_b" => "b"}}
+    %{"a" => %{"b" => "b"}}
+
   """
-  def remove_leading_underscores(map, options) do
+  def remove_leading_underscores(map, options \\ []) do
     remover = fn
       {k, v} when is_binary(k)-> {String.trim_leading(k, "_"), v}
       other -> other
@@ -531,7 +547,7 @@ defmodule Cldr.Map do
       %{a: "aa", b: "b", c: "c", d: "d"}
 
   """
-  def deep_merge(left, right) do
+  def deep_merge(left, right) when is_map(left) and is_map(right) do
     Map.merge(left, right, &deep_resolve/3)
   end
 
