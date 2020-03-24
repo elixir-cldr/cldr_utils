@@ -11,5 +11,4 @@ defmodule Cldr.Code do
       {:error, _} -> false
     end
   end
-
 end

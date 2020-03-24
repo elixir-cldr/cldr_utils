@@ -84,7 +84,6 @@ defmodule Math.Test do
     end
   end
 
-
   test "power of 0 == 1" do
     assert Math.power(Decimal.new(123), 0) == Decimal.new(1)
   end

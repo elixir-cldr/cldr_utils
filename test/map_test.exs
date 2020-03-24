@@ -47,7 +47,7 @@ defmodule Support.Map.Test do
 
     assert Cldr.Map.atomize_keys(test_map, only: "nested") == test_result
     assert Cldr.Map.atomize_keys(test_map, only: ["nested"]) == test_result
-    assert Cldr.Map.atomize_keys(test_map, only: &(elem(&1,0) == "nested")) == test_result
+    assert Cldr.Map.atomize_keys(test_map, only: &(elem(&1, 0) == "nested")) == test_result
 
     assert Cldr.Map.atomize_keys(test_map, except: "key") == test_result
     assert Cldr.Map.atomize_keys(test_map, except: ["key"]) == test_result

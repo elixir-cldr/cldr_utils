@@ -28,17 +28,19 @@ defmodule Cldr.Helpers do
       end
 
     function_exported?(:persistent_term, :get, 1) ->
-       @doc false
-       def get_term(key, default) do
-         :persistent_term.get(key)
-       rescue ArgumentError ->
-         default
-       end
+      @doc false
+      def get_term(key, default) do
+        :persistent_term.get(key)
+      rescue
+        ArgumentError ->
+          default
+      end
 
-       @doc false
-       def put_term(key, value) do
-         :persistent_term.put(key, value)
-       end
+      @doc false
+      def put_term(key, value) do
+        :persistent_term.put(key, value)
+      end
+
     true ->
       @doc false
       def get_term(_key, default) do

@@ -17,12 +17,13 @@ defmodule Cldr.String do
   def hash(string) do
     {hash, _} =
       string
-      |> String.to_charlist
+      |> String.to_charlist()
       |> Enum.reduce({0, 1}, fn char, {hash, p_pow} ->
         hash = rem(hash + char * p_pow, @m)
         p_pow = rem(p_pow * @p, @m)
         {hash, p_pow}
       end)
+
     hash
   end
 

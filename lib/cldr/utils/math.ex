@@ -867,9 +867,10 @@ defmodule Cldr.Math do
   end
 
   @doc false
-  @decimal_version Application.ensure_all_started(:decimal) && Application.spec(:decimal)
-                   |> Keyword.get(:vsn)
-                   |> List.to_string
+  @decimal_version Application.ensure_all_started(:decimal) &&
+                     Application.spec(:decimal)
+                     |> Keyword.get(:vsn)
+                     |> List.to_string()
 
   if Version.match?(@decimal_version, "~> 1.6 or ~> 1.9.0-rc") do
     def decimal_compare(d1, d2) do

@@ -4,11 +4,10 @@ defmodule Support.Macro.Test do
 
   test "warn once" do
     assert capture_log(fn ->
-      defmodule M do
-        import Cldr.Macros
-        warn_once :a, "Here we are"
-      end
-    end) =~ "Here we are"
+             defmodule M do
+               import Cldr.Macros
+               warn_once(:a, "Here we are")
+             end
+           end) =~ "Here we are"
   end
-
 end

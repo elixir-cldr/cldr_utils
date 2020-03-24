@@ -61,6 +61,8 @@ defmodule Math.Power.Test do
     a = Decimal.new("0.00001232")
     b = Decimal.new("0.00001242")
     x = Decimal.sub(a, b)
-    assert Cldr.Math.decimal_compare(Cldr.Math.power(x, 2), Decimal.new("0.00000000000001")) == :eq
+
+    assert Cldr.Math.decimal_compare(Cldr.Math.power(x, 2), Decimal.new("0.00000000000001")) ==
+             :eq
   end
 end

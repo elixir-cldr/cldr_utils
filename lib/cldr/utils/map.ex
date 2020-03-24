@@ -3,6 +3,14 @@ defmodule Cldr.Map do
   Functions for transforming maps, keys and values.
   """
 
+  @doc """
+  Returns am argument unchanged.
+
+  Useful when a `noop` function is required.
+  """
+  def identity(x), do: x
+
+
   @default_deep_map_options [level: 1..1_000_000]
   @starting_level 1
   @max_level 1_000_000
@@ -15,10 +23,13 @@ defmodule Cldr.Map do
 
   * `map` is any `t:map/0`
 
-  * `function` is a function or function reference that
-    is called for each key/value pair of the provided map
+  * `function` is a `1-arity` function or function reference that
+    is called for each key/value pair of the provided map. It can
+    also be a 2-tuple of the form `{key_function, value_function}`
+    in which the `key_function` is called with each key and the
+    `value_function` is called with each value.
 
-  * `options` is a keyword list of options
+  * `options` is a keyword list of options. The default is `[]`
 
   ## Options
 
@@ -26,6 +37,25 @@ defmodule Cldr.Map do
     the map at which the `function` is executed. This can
     be an integer representing all levels from `level` or a range
     indicating a range of levels. The default is `1..#{@max_level}`
+
+  * `:only` is a term or list of terms or a `check function`. If it is a term
+    or list of terms, the `function` is only called if the `key` of the
+    map is equal to the term or in the list of terms. If `:only` is a
+    `check function` then the `check function` is passed the `{k, v}` of
+    the current branch in the `map`. It is expected to return a `truthy`
+    value that if `true` signals that the argument `function` will be executed.
+
+  * `:except` is a term or list of terms or a `check function`. If it is a term
+    or list of terms, the `function` is only called if the `key` of the
+    map is not equal to the term or not in the list of terms. If `:except` is a
+    `check function` then the `check function` is passed the `{k, v}` of
+    the current branch in the `map`. It is expected to return a `truthy`
+    value that if `true` signals that the argument `function` will not be executed.
+
+  ## Notes
+
+  If both the options `:only` and `:except` are provided then the `function`
+  is called only when a `term` meets both criteria.
 
   ## Returns
 
@@ -42,8 +72,12 @@ defmodule Cldr.Map do
     %{a: "A", b: %{c: "C"}}
 
   """
-  @spec deep_map(map() | list(), function :: function() | {function(), function()}, options :: list() | map()) ::
-    map() | list()
+  @spec deep_map(
+          map() | list(),
+          function :: function() | {function(), function()},
+          options :: list() | map()
+        ) ::
+          map() | list()
 
   def deep_map(map, function, options \\ @default_deep_map_options)
 
@@ -54,14 +88,19 @@ defmodule Cldr.Map do
   end
 
   def deep_map(map_or_list, function, options)
-      when is_map(map_or_list) or is_list(map_or_list) and is_list(options) do
+      when is_map(map_or_list) or (is_list(map_or_list) and is_list(options)) do
     options =
       (@default_deep_map_options ++ options)
       |> Map.new()
       |> Map.update!(:level, fn
-        level when is_integer(level) -> level..@max_level
-        %Range{} = level -> level
-        other -> raise ArgumentError, "Level must be an integer or a range. Found #{inspect other}"
+        level when is_integer(level) ->
+          level..@max_level
+
+        %Range{} = level ->
+          level
+
+        other ->
+          raise ArgumentError, "Level must be an integer or a range. Found #{inspect(other)}"
       end)
 
     deep_map(map_or_list, function, options, @starting_level)
@@ -71,13 +110,17 @@ defmodule Cldr.Map do
     nil
   end
 
+  # If the level is greater than the return
+  # just return the map or list
   defp deep_map(map_or_list, _function, %{level: %{last: last}}, level)
-      when level > last do
+       when level > last do
     map_or_list
   end
 
+  # If the level is less than the range then keep recursing
+  # without executing the function
   defp deep_map(map, function, %{level: %{first: first}} = options, level)
-      when is_map(map) and is_function(function) and level < first do
+       when is_map(map) and is_function(function) and level < first do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
         {k, deep_map(v, function, options, level + 1)}
@@ -85,11 +128,11 @@ defmodule Cldr.Map do
       {k, v} ->
         {k, v}
     end)
-    |> Map.new
+    |> Map.new()
   end
 
   defp deep_map(map, {key_function, value_function}, %{level: %{first: first}} = options, level)
-      when is_map(map) and level < first do
+       when is_map(map) and level < first do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
         {k, deep_map(v, {key_function, value_function}, options, level + 1)}
@@ -97,9 +140,11 @@ defmodule Cldr.Map do
       {k, v} ->
         {k, v}
     end)
-    |> Map.new
+    |> Map.new()
   end
 
+  # Here we are in range so we conditionally execute the function
+  # if the options for `:only` and `:except` are matched
   defp deep_map(map, function, options, level) when is_map(map) and is_function(function) do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
@@ -108,28 +153,23 @@ defmodule Cldr.Map do
       {k, v} ->
         maybe_execute(function, {k, v}, options)
     end)
-    |> Map.new
+    |> Map.new()
   end
 
   defp deep_map(map, {key_function, value_function}, options, level) when is_map(map) do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
         {maybe_execute(key_function, k, options),
-          deep_map(v, {key_function, value_function}, options, level + 1)}
+         deep_map(v, {key_function, value_function}, options, level + 1)}
 
       {k, v} ->
         {maybe_execute(key_function, k, options), maybe_execute(value_function, v, options)}
     end)
-    |> Map.new
+    |> Map.new()
   end
 
-  defp deep_map([head | rest], function, options, level) when is_function(function) do
+  defp deep_map([head | rest], function, options, level) do
     [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
-  end
-
-  defp deep_map([head | rest], {key_function, value_function}, options, level) do
-    [deep_map(head, {key_function, value_function}, options, level + 1) |
-     deep_map(rest, {key_function, value_function}, options, level + 1)]
   end
 
   defp deep_map(value, function, options, _level) when is_function(function) do
@@ -140,6 +180,8 @@ defmodule Cldr.Map do
     maybe_execute(value_function, value, options)
   end
 
+  # Execute the function if the conditions expressed
+  # by options `:only` and `:except` are met
   defp maybe_execute(function, value, options) do
     if process_element?(value, options) do
       function.(value)
@@ -151,13 +193,16 @@ defmodule Cldr.Map do
   @doc """
   Transforms a `map`'s `String.t` keys to `atom()` keys.
 
+  ## Arguments
+
   * `map` is any `t:map/0`
 
-  * `options` is a keyword list of options.  The
-    available option is:
+  * `options` is a keyword list of options passed
+    to `deep_map/3`. One additional option apples
+    to this function directly:
 
     * `:only_existing` which is set to `true` will
-      only convert the binary key to an atom if the atom
+      only convert the binary value to an atom if the atom
       already exists.  The default is `false`.
 
   ## Examples
@@ -165,17 +210,20 @@ defmodule Cldr.Map do
   """
   @default_atomize_options [only_existing: false]
   def atomize_keys(map, options \\ []) do
-    options = (@default_atomize_options ++ options)
+    options = @default_atomize_options ++ options
     deep_map(map, &atomize_key(&1, Map.new(options)), options)
   end
 
   @doc """
   Transforms a `map`'s `String.t` values to `atom()` values.
 
+  ## Arguments
+
   * `map` is any `t:map/0`
 
-  * `options` is a keyword list of options.  The
-    available option is:
+  * `options` is a keyword list of options passed
+    to `deep_map/3`. One additional option apples
+    to this function directly:
 
     * `:only_existing` which is set to `true` will
       only convert the binary value to an atom if the atom
@@ -185,33 +233,19 @@ defmodule Cldr.Map do
 
   """
   def atomize_values(map, options \\ [only_existing: false]) do
-    options = (@default_atomize_options ++ options)
+    options = @default_atomize_options ++ options
     deep_map(map, &atomize_value(&1, Map.new(options)), options)
   end
 
   @doc """
-  Transforms a `map`'s `atom()` keys to `String.t` keys.
+  Transforms a `map`'s `String.t` keys to `Integer.t` keys.
+
+  ## Arguments
 
   * `map` is any `t:map/0`
 
-  ## Examples
-
-  """
-  def stringify_keys(map) do
-    deep_map(
-      map,
-      fn
-        k when is_atom(k) -> Atom.to_string(k)
-        k -> k
-      end,
-      &identity/1
-    )
-  end
-
-  @doc """
-  Transforms a `map`'s keys to `Integer.t` keys.
-
-  * `map` is any `t:map/0`
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   The map key is converted to an `integer` from
   either an `atom` or `String.t` only when the
@@ -228,9 +262,14 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Transforms a `map`'s values to `Integer.t` values.
+  Transforms a `map`'s `String.t` values to `Integer.t` values.
+
+  ## Arguments
 
   * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   The map value is converted to an `integer` from
   either an `atom` or `String.t` only when the
@@ -247,9 +286,14 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Transforms a `map`'s keys to `Float.t` values.
+  Transforms a `map`'s `String.t` keys to `Float.t` values.
+
+  ## Arguments
 
   * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   The map key is converted to a `float` from
   either an `atom` or `String.t` only when the
@@ -266,9 +310,14 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Transforms a `map`'s values to `Float.t` values.
+  Transforms a `map`'s `String.t` values to `Float.t` values.
+
+  ## Arguments
 
   * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   The map value is converted to a `float` from
   either an `atom` or `String.t` only when the
@@ -285,32 +334,29 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Rename map keys from `from` to `to`
+  Transforms a `map`'s `atom()` keys to `String.t` keys.
+
+  ## Arguments
 
   * `map` is any `t:map/0`
 
-  * `from` is any value map key
-
-  * `to` is any valud map key
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   ## Examples
 
   """
-  def rename_key(map, from, to) do
-    deep_map(
-      map,
-      fn
-        ^from -> to
-        other -> other
-      end,
-      &identity/1
-    )
+  def stringify_keys(map, options \\ []) do
+    deep_map(map, &stringify_key/1, options)
   end
 
   @doc """
-  Convert map keys from `camelCase` to `snake_case`
+  Convert map `String.t` keys from `camelCase` to `snake_case`
 
   * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   ## Examples
 
@@ -320,256 +366,27 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Removes any leading underscores from `map`
-  keys.
+  Rename map keys from `from` to `to`
 
   * `map` is any `t:map/0`
 
-  ## Examples
+  * `from` is any value map key
 
-  """
-  def remove_leading_underscores(map) do
-    deep_map(map, {&String.replace_prefix(&1, "_", ""), &identity/1})
-  end
+  * `to` is any valid map key
 
-  @doc """
-  Returns the result of deep merging a list of maps
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
 
   ## Examples
 
-      iex> Cldr.Map.merge_map_list [%{a: "a", b: "b"}, %{c: "c", d: "d"}]
-      %{a: "a", b: "b", c: "c", d: "d"}
-
   """
-  def merge_map_list([h | []]) do
-    h
-  end
-
-  def merge_map_list([h | t]) do
-    deep_merge(h, merge_map_list(t))
-  end
-
-  def merge_map_list([]) do
-    []
-  end
-
-  @doc """
-  Deep merge two maps
-
-  * `left` is any `t:map/0`
-
-  * `right` is any `t:map/0`
-
-  ## Examples
-
-      iex> Cldr.Map.deep_merge %{a: "a", b: "b"}, %{c: "c", d: "d"}
-      %{a: "a", b: "b", c: "c", d: "d"}
-
-      iex> Cldr.Map.deep_merge %{a: "a", b: "b"}, %{c: "c", d: "d", a: "aa"}
-      %{a: "aa", b: "b", c: "c", d: "d"}
-
-  """
-  def deep_merge(left, right) do
-    Map.merge(left, right, &deep_resolve/3)
-  end
-
-  # Key exists in both maps, and both values are maps as well.
-  # These can be merged recursively.
-  defp deep_resolve(_key, left = %{}, right = %{}) do
-    deep_merge(left, right)
-  end
-
-  # Key exists in both maps, but at least one of the values is
-  # NOT a map. We fall back to standard merge behavior, preferring
-  # the value on the right.
-  defp deep_resolve(_key, _left, right) do
-    right
-  end
-
-  @doc """
-  Delete all members of a map that have a
-  key in the list of keys
-
-  ## Examples
-
-      iex> Cldr.Map.delete_in %{a: "a", b: "b"}, [:a]
-      %{b: "b"}
-
-  """
-  def delete_in(%{} = map, keys) when is_list(keys) do
-    Enum.reject(map, fn {k, _v} -> k in keys end)
-    |> Enum.map(fn {k, v} -> {k, delete_in(v, keys)} end)
-    |> Map.new
-  end
-
-  def delete_in(map, keys) when is_list(map) and is_binary(keys) do
-    delete_in(map, [keys])
-  end
-
-  def delete_in(map, keys) when is_list(map) do
-    Enum.reject(map, fn {k, _v} -> k in keys end)
-    |> Enum.map(fn {k, v} -> {k, delete_in(v, keys)} end)
-  end
-
-  def delete_in(%{} = map, keys) when is_binary(keys) do
-    delete_in(map, [keys])
-  end
-
-  def delete_in(other, _keys) do
-    other
-  end
-
-  def from_keyword(keyword) do
-    Enum.into(keyword, %{})
-  end
-
-  defp identity(x), do: x
-
-  defp atomize_key({k, v}, %{only_existing: true}) when is_binary(k) do
-    {String.to_existing_atom(k), v}
-  rescue
-    ArgumentError -> {k, v}
-  end
-
-  defp atomize_key({k, v}, %{only_existing: false}) when is_binary(k) do
-    {String.to_atom(k), v}
-  end
-
-  defp atomize_key(x, _options) do
-    x
-  end
-
-  def atomize_value({k, v}, %{only_existing: true}) when is_binary(v) do
-    {k, String.to_existing_atom(v)}
-  rescue
-    ArgumentError -> {k, v}
-  end
-
-  def atomize_value({k, v}, %{only_existing: false}) when is_binary(v) do
-    {k, String.to_atom(v)}
-  end
-
-  def atomize_value(v, %{only_existing: false}) when is_binary(v) do
-    String.to_atom(v)
-  end
-
-  def atomize_value(x, _options) do
-    x
-  end
-
-  @integer_reg Regex.compile!("^-?[0-9]+$")
-  defp integerize_key({k, v}) when is_binary(k) do
-    if Regex.match?(@integer_reg, k) do
-      {String.to_integer(k), v}
-    else
-      {k, v}
+  def rename_keys(map, from, to, options \\ []) do
+    renamer = fn
+      {^from, v} -> {to, v}
+      other -> other
     end
-  end
 
-  defp integerize_key(x) do
-    x
-  end
-
-  defp integerize_value({k, v}) when is_binary(v) do
-    if Regex.match?(@integer_reg, v) do
-      {k, String.to_integer(v)}
-    else
-      {k, v}
-    end
-  end
-
-  defp integerize_value(x) do
-    x
-  end
-
-  defp underscore_key({k, v}) when is_binary(k) do
-    {underscore(k), v}
-  end
-
-  defp underscore_key(x) do
-    x
-  end
-
-  @float_reg Regex.compile!("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$")
-  defp floatize_key({k, v}) when is_atom(k) do
-    floatize_key({Atom.to_string(k), v})
-  end
-
-  defp floatize_key({k, v}) when is_binary(k) do
-    {String.to_float(k), v}
-  end
-
-  defp floatize_key(x) do
-    x
-  end
-
-  defp floatize_value({k, v}) when is_atom(v) do
-    floatize_value({k, Atom.to_string(v)})
-  end
-
-  defp floatize_value({k, v}) when is_binary(v) do
-    if Regex.match?(@float_reg, v) do
-      {k, String.to_float(v)}
-    else
-      {k, v}
-    end
-  end
-
-  defp floatize_value(x) do
-    x
-  end
-
-  defp process_element?(x, options) do
-    only = Map.get(options, :only, []) |> maybe_wrap
-    except = Map.get(options, :except, []) |> maybe_wrap
-    process_element?(x, only, except)
-  end
-
-  def maybe_wrap(element) when is_list(element) do
-    element
-  end
-
-  def maybe_wrap(element) do
-    [element]
-  end
-
-  # process_element?/2 determines whether the
-  # calling function should apply to a given
-  # value
-  defp process_element?(_x, [], []) do
-    true
-  end
-
-  defp process_element?(x, [], [except]) when is_function(except) do
-    !except.(x)
-  end
-
-  defp process_element?({k, _v}, [], except) do
-    k not in except
-  end
-
-  defp process_element?(x, [only], []) when is_function(only) do
-    only.(x)
-  end
-
-  defp process_element?({k, _v}, only, []) do
-    k in only
-  end
-
-  defp process_element?(x, [only], [except]) when is_function(only) and is_function(except) do
-    only.(x) && not except.(x)
-  end
-
-  defp process_element?({k, _v} = x, [only], except) when is_function(only) do
-    only.(x) && k not in except
-  end
-
-  defp process_element?({k, _v} = x, only, [except]) when is_function(except) do
-   k in only && !except.(x)
-  end
-
-  defp process_element?(x, only, except) do
-    x in only and x not in except
+    deep_map(map, renamer, options)
   end
 
   @doc """
@@ -640,10 +457,258 @@ defmodule Cldr.Map do
     <<>>
   end
 
-  def to_upper_char(char) when char >= ?a and char <= ?z, do: char - 32
-  def to_upper_char(char), do: char
+  defp to_lower_char(char) when char == ?-, do: ?_
+  defp to_lower_char(char) when char >= ?A and char <= ?Z, do: char + 32
+  defp to_lower_char(char), do: char
 
-  def to_lower_char(char) when char == ?-, do: ?_
-  def to_lower_char(char) when char >= ?A and char <= ?Z, do: char + 32
-  def to_lower_char(char), do: char
+  @doc """
+  Removes any leading underscores from `map`
+  `String.t` keys.
+
+  * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
+
+  ## Examples
+
+  """
+  def remove_leading_underscores(map, options) do
+    remover = fn
+      {k, v} when is_binary(k)-> {String.trim_leading(k, "_"), v}
+      other -> other
+    end
+
+    deep_map(map, remover, options)
+  end
+
+  @doc """
+  Returns the result of deep merging a list of maps
+
+  ## Examples
+
+      iex> Cldr.Map.merge_map_list [%{a: "a", b: "b"}, %{c: "c", d: "d"}]
+      %{a: "a", b: "b", c: "c", d: "d"}
+
+  """
+  def merge_map_list([h | []]) do
+    h
+  end
+
+  def merge_map_list([h | t]) do
+    deep_merge(h, merge_map_list(t))
+  end
+
+  def merge_map_list([]) do
+    []
+  end
+
+  @doc """
+  Deep merge two maps
+
+  * `left` is any `t:map/0`
+
+  * `right` is any `t:map/0`
+
+  ## Examples
+
+      iex> Cldr.Map.deep_merge %{a: "a", b: "b"}, %{c: "c", d: "d"}
+      %{a: "a", b: "b", c: "c", d: "d"}
+
+      iex> Cldr.Map.deep_merge %{a: "a", b: "b"}, %{c: "c", d: "d", a: "aa"}
+      %{a: "aa", b: "b", c: "c", d: "d"}
+
+  """
+  def deep_merge(left, right) do
+    Map.merge(left, right, &deep_resolve/3)
+  end
+
+  # Key exists in both maps, and both values are maps as well.
+  # These can be merged recursively.
+  defp deep_resolve(_key, left, right) when is_map(left) and is_map(right) do
+    deep_merge(left, right)
+  end
+
+  # Key exists in both maps, but at least one of the values is
+  # NOT a map. We fall back to standard merge behavior, preferring
+  # the value on the right.
+  defp deep_resolve(_key, _left, right) do
+    right
+  end
+
+  @doc """
+  Delete all members of a map that have a
+  key in the list of keys
+
+  ## Examples
+
+      iex> Cldr.Map.delete_in %{a: "a", b: "b"}, [:a]
+      %{b: "b"}
+
+  """
+  def delete_in(%{} = map, keys) when is_list(keys) do
+    Enum.reject(map, fn {k, _v} -> k in keys end)
+    |> Enum.map(fn {k, v} -> {k, delete_in(v, keys)} end)
+    |> Map.new()
+  end
+
+  def delete_in(map, keys) when is_list(map) and is_binary(keys) do
+    delete_in(map, [keys])
+  end
+
+  def delete_in(map, keys) when is_list(map) do
+    Enum.reject(map, fn {k, _v} -> k in keys end)
+    |> Enum.map(fn {k, v} -> {k, delete_in(v, keys)} end)
+  end
+
+  def delete_in(%{} = map, keys) when is_binary(keys) do
+    delete_in(map, [keys])
+  end
+
+  def delete_in(other, _keys) do
+    other
+  end
+
+  #
+  # Helpers
+  #
+
+  defp atomize_key({k, v}, %{only_existing: true}) when is_binary(k) do
+    {String.to_existing_atom(k), v}
+  rescue
+    ArgumentError -> {k, v}
+  end
+
+  defp atomize_key({k, v}, %{only_existing: false}) when is_binary(k) do
+    {String.to_atom(k), v}
+  end
+
+  defp atomize_key(other, _options) do
+    other
+  end
+
+  defp atomize_value({k, v}, %{only_existing: true}) when is_binary(v) do
+    {k, String.to_existing_atom(v)}
+  rescue
+    ArgumentError -> {k, v}
+  end
+
+  defp atomize_value({k, v}, %{only_existing: false}) when is_binary(v) do
+    {k, String.to_atom(v)}
+  end
+
+  defp atomize_value(v, %{only_existing: false}) when is_binary(v) do
+    String.to_atom(v)
+  end
+
+  defp atomize_value(other, _options) do
+    other
+  end
+
+  @integer_reg Regex.compile!("^-?[0-9]+$")
+  defp integerize_key({k, v}) when is_binary(k) do
+    if Regex.match?(@integer_reg, k) do
+      {String.to_integer(k), v}
+    else
+      {k, v}
+    end
+  end
+
+  defp integerize_key(other) do
+    other
+  end
+
+  defp integerize_value({k, v}) when is_binary(v) do
+    if Regex.match?(@integer_reg, v) do
+      {k, String.to_integer(v)}
+    else
+      {k, v}
+    end
+  end
+
+  @float_reg Regex.compile!("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$")
+  defp floatize_key({k, v}) when is_binary(k) do
+    if Regex.match?(@float_reg, k) do
+      {String.to_float(k), v}
+    else
+      {k, v}
+    end
+  end
+
+  defp floatize_key(other) do
+    other
+  end
+
+  defp floatize_value({k, v}) when is_binary(v) do
+    if Regex.match?(@float_reg, v) do
+      {k, String.to_float(v)}
+    else
+      {k, v}
+    end
+  end
+
+  defp floatize_value(x) do
+    x
+  end
+
+  defp stringify_key({k, v}) when is_atom(k), do: {Atom.to_string(k), v}
+  defp stringify_key(other), do: other
+
+  defp underscore_key({k, v}) when is_binary(k), do: {underscore(k), v}
+  defp underscore_key(other), do: other
+
+  # If the term isn't a list, wrap it in a list
+  defp maybe_wrap(element) when is_list(element) do
+    element
+  end
+
+  defp maybe_wrap(element) do
+    [element]
+  end
+
+  # process_element?/2 determines whether the
+  # calling function should apply to a given
+  # value
+  defp process_element?(x, options) do
+    only = Map.get(options, :only, []) |> maybe_wrap
+    except = Map.get(options, :except, []) |> maybe_wrap
+    process_element?(x, only, except)
+  end
+
+  defp process_element?(_x, [], []) do
+    true
+  end
+
+  defp process_element?(x, [], [except]) when is_function(except) do
+    !except.(x)
+  end
+
+  defp process_element?({k, _v}, [], except) do
+    k not in except
+  end
+
+  defp process_element?(x, [only], []) when is_function(only) do
+    only.(x)
+  end
+
+  defp process_element?({k, _v}, only, []) do
+    k in only
+  end
+
+  defp process_element?(x, [only], [except]) when is_function(only) and is_function(except) do
+    only.(x) && not except.(x)
+  end
+
+  defp process_element?({k, _v} = x, [only], except) when is_function(only) do
+    only.(x) && k not in except
+  end
+
+  defp process_element?({k, _v} = x, only, [except]) when is_function(except) do
+    k in only && !except.(x)
+  end
+
+  defp process_element?(x, only, except) do
+    x in only and x not in except
+  end
+
 end
