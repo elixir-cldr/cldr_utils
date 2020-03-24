@@ -470,10 +470,6 @@ defmodule Cldr.Map do
     x
   end
 
-  defp integerize_value({k, v}) when is_atom(v) do
-    integerize_value({k, Atom.to_string(v)})
-  end
-
   defp integerize_value({k, v}) when is_binary(v) do
     if Regex.match?(@integer_reg, v) do
       {k, String.to_integer(v)}
@@ -484,11 +480,6 @@ defmodule Cldr.Map do
 
   defp integerize_value(x) do
     x
-  end
-
-  defp underscore_key({k, v}) when is_atom(k) do
-    {Atom.to_string(k), v}
-    |> underscore_key()
   end
 
   defp underscore_key({k, v}) when is_binary(k) do
