@@ -35,7 +35,7 @@ defmodule Cldr.Map do
 
   * `:level` indicates the starting (and optionally ending) levels of
     the map at which the `function` is executed. This can
-    be an integer representing all levels from `level` or a range
+    be an integer representing one `level` or a range
     indicating a range of levels. The default is `1..#{@max_level}`
 
   * `:only` is a term or list of terms or a `check function`. If it is a term
@@ -75,7 +75,7 @@ defmodule Cldr.Map do
   @spec deep_map(
           map() | list(),
           function :: function() | {function(), function()},
-          options :: list() | map()
+          options :: list()
         ) ::
           map() | list()
 
@@ -88,21 +88,8 @@ defmodule Cldr.Map do
   end
 
   def deep_map(map_or_list, function, options)
-      when is_map(map_or_list) or (is_list(map_or_list) and is_list(options)) do
-    options =
-      (@default_deep_map_options ++ options)
-      |> Map.new()
-      |> Map.update!(:level, fn
-        level when is_integer(level) ->
-          level..@max_level
-
-        %Range{} = level ->
-          level
-
-        other ->
-          raise ArgumentError, "Level must be an integer or a range. Found #{inspect(other)}"
-      end)
-
+      when (is_map(map_or_list) or is_list(map_or_list)) and is_list(options) do
+    options = validate_options(function, options)
     deep_map(map_or_list, function, options, @starting_level)
   end
 
@@ -112,30 +99,17 @@ defmodule Cldr.Map do
 
   # If the level is greater than the return
   # just return the map or list
-  defp deep_map(map_or_list, _function, %{level: %{last: last}}, level)
-       when level > last do
+  defp deep_map(map_or_list, _function, %{level: %{last: last}}, level) when level > last do
     map_or_list
   end
 
   # If the level is less than the range then keep recursing
   # without executing the function
   defp deep_map(map, function, %{level: %{first: first}} = options, level)
-       when is_map(map) and is_function(function) and level < first do
-    Enum.map(map, fn
-      {k, v} when is_map(v) or is_list(v) ->
-        {k, deep_map(v, function, options, level + 1)}
-
-      {k, v} ->
-        {k, v}
-    end)
-    |> Map.new()
-  end
-
-  defp deep_map(map, {key_function, value_function}, %{level: %{first: first}} = options, level)
        when is_map(map) and level < first do
     Enum.map(map, fn
       {k, v} when is_map(v) or is_list(v) ->
-        {k, deep_map(v, {key_function, value_function}, options, level + 1)}
+        {k, deep_map(v, function, options, level + 1)}
 
       {k, v} ->
         {k, v}
@@ -166,6 +140,10 @@ defmodule Cldr.Map do
         {maybe_execute(key_function, k, options), maybe_execute(value_function, v, options)}
     end)
     |> Map.new()
+  end
+
+  defp deep_map([], _function, _options, _level) do
+    []
   end
 
   defp deep_map([head | rest], function, options, level) do
@@ -207,6 +185,9 @@ defmodule Cldr.Map do
 
   ## Examples
 
+    iex> Cldr.Map.atomize_keys %{"a" => %{"b" => %{1 => "c"}}}
+    %{a: %{b: %{1 => "c"}}}
+
   """
   @default_atomize_options [only_existing: false]
   def atomize_keys(map, options \\ []) do
@@ -230,6 +211,9 @@ defmodule Cldr.Map do
       already exists.  The default is `false`.
 
   ## Examples
+
+    iex> Cldr.Map.atomize_values %{"a" => %{"b" => %{1 => "c"}}}
+    %{"a" => %{"b" => %{1 => :c}}}
 
   """
   def atomize_values(map, options \\ [only_existing: false]) do
@@ -256,6 +240,9 @@ defmodule Cldr.Map do
 
   ## Examples
 
+      iex> Cldr.Map.integerize_keys %{a: %{"1" => "value"}}
+      %{a: %{1 => "value"}}
+
   """
   def integerize_keys(map, options \\ []) do
     deep_map(map, &integerize_key/1, options)
@@ -280,6 +267,9 @@ defmodule Cldr.Map do
 
   ## Examples
 
+    iex> Cldr.Map.integerize_values %{a: %{b: "1"}}
+    %{a: %{b: 1}}
+
   """
   def integerize_values(map, options \\ []) do
     deep_map(map, &integerize_value/1, options)
@@ -296,13 +286,19 @@ defmodule Cldr.Map do
     to `deep_map/3`
 
   The map key is converted to a `float` from
-  either an `atom` or `String.t` only when the
-  key is comprised of a valid float form.
+  a `String.t` only when the key is comprised of
+  a valid float form.
 
   Keys which cannot be converted to a `float`
   are returned unchanged.
 
   ## Examples
+
+    iex> Cldr.Map.floatize_keys %{a: %{"1.0" => "value"}}
+    %{a: %{1.0 => "value"}}
+
+    iex> Cldr.Map.floatize_keys %{a: %{"1" => "value"}}
+    %{a: %{1.0 => "value"}}
 
   """
   def floatize_keys(map, options \\ []) do
@@ -320,13 +316,19 @@ defmodule Cldr.Map do
     to `deep_map/3`
 
   The map value is converted to a `float` from
-  either an `atom` or `String.t` only when the
+  a `String.t` only when the
   value is comprised of a valid float form.
 
   Values which cannot be converted to a `float`
   are returned unchanged.
 
   ## Examples
+
+    iex> Cldr.Map.floatize_values %{a: %{b: "1.0"}}
+    %{a: %{b: 1.0}}
+
+    iex> Cldr.Map.floatize_values %{a: %{b: "1"}}
+    %{a: %{b: 1.0}}
 
   """
   def floatize_values(map, options \\ []) do
@@ -345,6 +347,9 @@ defmodule Cldr.Map do
 
   ## Examples
 
+    iex> Cldr.Map.stringify_keys %{a: %{"1" => "value"}}
+    %{"a" => %{"1" => "value"}}
+
   """
   def stringify_keys(map, options \\ []) do
     deep_map(map, &stringify_key/1, options)
@@ -359,6 +364,9 @@ defmodule Cldr.Map do
     to `deep_map/3`
 
   ## Examples
+
+    iex> Cldr.Map.underscore_keys %{"a" => %{"thisOne" => "value"}}
+    %{"a" => %{"this_one" => "value"}}
 
   """
   def underscore_keys(map, options \\ []) when is_map(map) or is_nil(map) do
@@ -378,6 +386,9 @@ defmodule Cldr.Map do
     to `deep_map/3`
 
   ## Examples
+
+    iex> Cldr.Map.rename_keys %{"a" => %{"this_one" => "value"}}, "this_one", "that_one"
+    %{"a" => %{"that_one" => "value"}}
 
   """
   def rename_keys(map, from, to, options \\ []) do
@@ -410,19 +421,20 @@ defmodule Cldr.Map do
 
   ## Examples
 
+    iex> Cldr.Map.underscore "thisThat"
+    "this_that"
+
+    iex> Cldr.Map.underscore "This_That"
+    "this_that"
+
   """
   @spec underscore(string :: String.t() | atom()) :: String.t()
-  def underscore(atom) when is_atom(atom) do
-    "Elixir." <> rest = Atom.to_string(atom)
-    underscore(rest)
-  end
-
   def underscore(<<h, t::binary>>) do
     <<to_lower_char(h)>> <> do_underscore(t, h)
   end
 
-  def underscore("") do
-    ""
+  def underscore(other) do
+    other
   end
 
   # h is upper case, next char is not uppercase, or a _ or .  => and prev != _
@@ -573,6 +585,35 @@ defmodule Cldr.Map do
   # Helpers
   #
 
+  defp validate_options(function, options) when is_function(function) do
+    validate_options(options)
+  end
+
+  defp validate_options({key_function, value_function}, options)
+      when is_function(key_function) and is_function(value_function) do
+    validate_options(options)
+  end
+
+  defp validate_options(function, _options) do
+    raise ArgumentError, "function parameter must be a function or a 2-tuple " <>
+    "consisting of a key_function and a value_function. Found #{inspect function}"
+  end
+
+  defp validate_options(options) do
+    (@default_deep_map_options ++ options)
+    |> Map.new()
+    |> Map.update!(:level, fn
+      level when is_integer(level) ->
+        level..level
+
+      %Range{} = level ->
+        level
+
+      other ->
+        raise ArgumentError, "Level must be an integer or a range. Found #{inspect(other)}"
+    end)
+  end
+
   defp atomize_key({k, v}, %{only_existing: true}) when is_binary(k) do
     {String.to_existing_atom(k), v}
   rescue
@@ -605,12 +646,10 @@ defmodule Cldr.Map do
     other
   end
 
-  @integer_reg Regex.compile!("^-?[0-9]+$")
   defp integerize_key({k, v}) when is_binary(k) do
-    if Regex.match?(@integer_reg, k) do
-      {String.to_integer(k), v}
-    else
-      {k, v}
+    case Integer.parse(k) do
+      {integer, ""} -> {integer, v}
+      _other -> {k, v}
     end
   end
 
@@ -619,19 +658,20 @@ defmodule Cldr.Map do
   end
 
   defp integerize_value({k, v}) when is_binary(v) do
-    if Regex.match?(@integer_reg, v) do
-      {k, String.to_integer(v)}
-    else
-      {k, v}
+    case Integer.parse(v) do
+      {integer, ""} -> {k, integer}
+      _other -> {k, v}
     end
   end
 
-  @float_reg Regex.compile!("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$")
+  defp integerize_value(other) do
+    other
+  end
+
   defp floatize_key({k, v}) when is_binary(k) do
-    if Regex.match?(@float_reg, k) do
-      {String.to_float(k), v}
-    else
-      {k, v}
+    case Float.parse(k) do
+      {float, ""} -> {float, v}
+      _other -> {k, v}
     end
   end
 
@@ -640,15 +680,14 @@ defmodule Cldr.Map do
   end
 
   defp floatize_value({k, v}) when is_binary(v) do
-    if Regex.match?(@float_reg, v) do
-      {k, String.to_float(v)}
-    else
-      {k, v}
+    case Float.parse(v) do
+      {float, ""} -> {k, float}
+      _other -> {k, v}
     end
   end
 
-  defp floatize_value(x) do
-    x
+  defp floatize_value(other) do
+    other
   end
 
   defp stringify_key({k, v}) when is_atom(k), do: {Atom.to_string(k), v}
