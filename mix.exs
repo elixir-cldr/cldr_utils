@@ -1,4 +1,4 @@
-defmodule CldrUtils.MixProject do
+defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
   @version "2.9.0-dev"
