@@ -16,8 +16,8 @@ defmodule Cldr.Map do
   @max_level 1_000_000
 
   @doc """
-  Recursively traverse a map and invoke a function for each key/
-  value pair that transforms the map.
+  Recursively traverse a map and invoke a function
+  that transforms the mapfor each key/value pair.
 
   ## Arguments
 
@@ -626,7 +626,7 @@ defmodule Cldr.Map do
         level
 
       other ->
-        raise ArgumentError, "Level must be an integer or a range. Found #{inspect(other)}"
+        raise ArgumentError, ":level must be an integer or a range. Found #{inspect(other)}"
     end)
   end
 
