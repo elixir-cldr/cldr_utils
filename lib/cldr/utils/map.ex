@@ -369,6 +369,26 @@ defmodule Cldr.Map do
   end
 
   @doc """
+  Transforms a `map`'s `atom()` keys to `String.t` keys.
+
+  ## Arguments
+
+  * `map` is any `t:map/0`
+
+  * `options` is a keyword list of options passed
+    to `deep_map/3`
+
+  ## Example
+
+    iex> Cldr.Map.stringify_keys %{a: %{"1" => :value}}
+    %{a: %{"1" => "value"}}
+
+  """
+  def stringify_values(map, options \\ []) do
+    deep_map(map, &stringify_value/1, options)
+  end
+
+  @doc """
   Convert map `String.t` keys from `camelCase` to `snake_case`
 
   * `map` is any `t:map/0`
@@ -597,6 +617,14 @@ defmodule Cldr.Map do
     other
   end
 
+  def from_keyword([] = list) do
+    Map.new(list)
+  end
+
+  def from_keyword([{key, _value} | _rest] = keyword_list) when is_atom(key) do
+    Map.new(keyword_list)
+  end
+
   #
   # Helpers
   #
@@ -708,6 +736,10 @@ defmodule Cldr.Map do
 
   defp stringify_key({k, v}) when is_atom(k), do: {Atom.to_string(k), v}
   defp stringify_key(other), do: other
+
+  defp stringify_value({k, v}) when is_atom(v), do: {k, Atom.to_string(v)}
+  defp stringify_value(other) when is_atom(other), do: Atom.to_string(other)
+  defp stringify_value(other), do: other
 
   defp underscore_key({k, v}) when is_binary(k), do: {underscore(k), v}
   defp underscore_key(other), do: other
