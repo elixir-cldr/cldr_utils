@@ -380,7 +380,7 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.stringify_keys %{a: %{"1" => :value}}
+    iex> Cldr.Map.stringify_values %{a: %{"1" => :value}}
     %{a: %{"1" => "value"}}
 
   """

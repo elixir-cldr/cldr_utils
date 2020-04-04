@@ -830,22 +830,22 @@ defmodule Cldr.Math do
 
   # scientific/decimal rounding are the same, we are just varying which
   # digit we start counting from to find our rounding point
-  def round_digits(digits_t, options)
+  defp round_digits(digits_t, options)
 
   # Passing true for decimal places avoids rounding and uses whatever is necessary
-  def round_digits(digits_t, %{scientific: true}), do: digits_t
-  def round_digits(digits_t, %{decimals: true}), do: digits_t
+  defp round_digits(digits_t, %{scientific: true}), do: digits_t
+  defp round_digits(digits_t, %{decimals: true}), do: digits_t
 
   # rounded away all the decimals... return 0
-  def round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, true}
-  def round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, true}
+  defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, true}
+  defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, true}
 
-  def round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
+  defp round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
     {digits, place, sign} = do_round(digits_t, dp + place - 1, options)
     {List.flatten(digits), place, sign}
   end
 
-  def round_digits(digits_t, options = %{scientific: dp}) do
+  defp round_digits(digits_t, options = %{scientific: dp}) do
     {digits, place, sign} = do_round(digits_t, dp, options)
     {List.flatten(digits), place, sign}
   end
