@@ -1,3 +1,8 @@
+![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/v/ex_cldr_calendars.svg)](https://hex.pm/packages/cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/dw/ex_cldr_calendars.svg?)](https://hex.pm/packages/cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/l/ex_cldr_calendars.svg)](https://hex.pm/packages/cldr_utils)
+
 # Cldr Utils
 
 Utility functions extracted from [cldr](https://github.com/elixir-cldr/cldr)
