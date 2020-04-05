@@ -22,7 +22,7 @@ This is the changelog for Cldr Utils v2.7.0 released on January 31st, 2020.  For
 
 ### Enhancements
 
-* Add `Cldr.String.to_underscore/1` the replaces "-" with "_"
+* Add `Cldr.String.to_underscore/1` that replaces "-" with "_"
 
 ## Changelog for Cldr Utils version 2.6.0
 
