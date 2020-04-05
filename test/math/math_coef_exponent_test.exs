@@ -1,5 +1,5 @@
 defmodule Math.Mantissa.Exponent.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   @test [
     1.23004,

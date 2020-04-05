@@ -1,5 +1,5 @@
 defmodule Math.Log.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   @round 2
   @samples [

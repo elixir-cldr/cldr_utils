@@ -1,5 +1,5 @@
 defmodule Math.Sqrt.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   # Each of these is validated to return the original number
   # when squared

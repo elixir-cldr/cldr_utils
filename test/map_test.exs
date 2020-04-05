@@ -1,5 +1,5 @@
 defmodule Support.Map.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "that map keys are underscored" do
     assert Cldr.Map.underscore_keys(%{"thisKey" => "value"}) == %{"this_key" => "value"}

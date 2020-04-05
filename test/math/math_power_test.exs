@@ -1,5 +1,5 @@
 defmodule Math.Power.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   @significance 15
 

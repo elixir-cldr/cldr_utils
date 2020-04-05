@@ -1,5 +1,6 @@
 defmodule Math.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+
   alias Cldr.Math
   alias Cldr.Digits
 

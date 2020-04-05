@@ -1,5 +1,5 @@
 defmodule Math.Int.Digits.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   @digits [
     {1, 1},

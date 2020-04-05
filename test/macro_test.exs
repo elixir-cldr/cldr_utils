@@ -1,5 +1,6 @@
 defmodule Support.Macro.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
+
   import ExUnit.CaptureLog
 
   test "warn once" do
