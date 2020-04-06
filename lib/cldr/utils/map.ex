@@ -203,9 +203,17 @@ defmodule Cldr.Map do
 
   """
   @default_atomize_options [only_existing: false]
-  def atomize_keys(map, options \\ []) do
+  def atomize_keys(map, options \\ [])
+
+  def atomize_keys(map, options) when is_map(map) or is_list(map) do
     options = @default_atomize_options ++ options
     deep_map(map, &atomize_key(&1, Map.new(options)), options)
+  end
+
+  def atomize_keys({k, value}, options) when is_map(value) do
+    options = @default_atomize_options ++ options
+    map_options = Map.new(options)
+    {atomize_key(k, map_options), deep_map(value, &atomize_key(&1, map_options), options)}
   end
 
   @doc """
@@ -229,9 +237,17 @@ defmodule Cldr.Map do
     %{"a" => %{"b" => %{1 => :c}}}
 
   """
-  def atomize_values(map, options \\ [only_existing: false]) do
+  def atomize_values(map, options \\ [only_existing: false])
+
+  def atomize_values(map, options) when is_map(map) or is_list(map) do
     options = @default_atomize_options ++ options
     deep_map(map, &atomize_value(&1, Map.new(options)), options)
+  end
+
+  def atomize_values({k, value}, options) when is_map(value) do
+    options = @default_atomize_options ++ options
+    map_options = Map.new(options)
+    {k, deep_map(value, &atomize_value(&1, map_options), options)}
   end
 
   @doc """
