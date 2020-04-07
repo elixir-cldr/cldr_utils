@@ -69,20 +69,20 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> map = %{a: :a, b: %{c: :c}}
-    iex> fun = fn
-    ...>   {k, v} when is_atom(k) -> {Atom.to_string(k), v}
-    ...>   other -> other
-    ...> end
-    iex> Cldr.Map.deep_map map, fun
-    %{"a" => :a, "b" => %{"c" => :c}}
-    iex> map = %{a: :a, b: %{c: :c}}
-    iex> Cldr.Map.deep_map map, fun, only: :c
-    %{a: :a, b: %{"c" => :c}}
-    iex> Cldr.Map.deep_map map, fun, except: [:a, :b]
-    %{a: :a, b: %{"c" => :c}}
-    iex> Cldr.Map.deep_map map, fun, level: 2
-    %{a: :a, b: %{"c" => :c}}
+      iex> map = %{a: :a, b: %{c: :c}}
+      iex> fun = fn
+      ...>   {k, v} when is_atom(k) -> {Atom.to_string(k), v}
+      ...>   other -> other
+      ...> end
+      iex> Cldr.Map.deep_map map, fun
+      %{"a" => :a, "b" => %{"c" => :c}}
+      iex> map = %{a: :a, b: %{c: :c}}
+      iex> Cldr.Map.deep_map map, fun, only: :c
+      %{a: :a, b: %{"c" => :c}}
+      iex> Cldr.Map.deep_map map, fun, except: [:a, :b]
+      %{a: :a, b: %{"c" => :c}}
+      iex> Cldr.Map.deep_map map, fun, level: 2
+      %{a: :a, b: %{"c" => :c}}
 
   """
   @spec deep_map(
@@ -198,8 +198,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.atomize_keys %{"a" => %{"b" => %{1 => "c"}}}
-    %{a: %{b: %{1 => "c"}}}
+      iex> Cldr.Map.atomize_keys %{"a" => %{"b" => %{1 => "c"}}}
+      %{a: %{b: %{1 => "c"}}}
 
   """
   @default_atomize_options [only_existing: false]
@@ -233,8 +233,8 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> Cldr.Map.atomize_values %{"a" => %{"b" => %{1 => "c"}}}
-    %{"a" => %{"b" => %{1 => :c}}}
+      iex> Cldr.Map.atomize_values %{"a" => %{"b" => %{1 => "c"}}}
+      %{"a" => %{"b" => %{1 => :c}}}
 
   """
   def atomize_values(map, options \\ [only_existing: false])
@@ -296,8 +296,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.integerize_values %{a: %{b: "1"}}
-    %{a: %{b: 1}}
+      iex> Cldr.Map.integerize_values %{a: %{b: "1"}}
+      %{a: %{b: 1}}
 
   """
   def integerize_values(map, options \\ []) do
@@ -323,11 +323,11 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> Cldr.Map.floatize_keys %{a: %{"1.0" => "value"}}
-    %{a: %{1.0 => "value"}}
+      iex> Cldr.Map.floatize_keys %{a: %{"1.0" => "value"}}
+      %{a: %{1.0 => "value"}}
 
-    iex> Cldr.Map.floatize_keys %{a: %{"1" => "value"}}
-    %{a: %{1.0 => "value"}}
+      iex> Cldr.Map.floatize_keys %{a: %{"1" => "value"}}
+      %{a: %{1.0 => "value"}}
 
   """
   def floatize_keys(map, options \\ []) do
@@ -353,11 +353,11 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> Cldr.Map.floatize_values %{a: %{b: "1.0"}}
-    %{a: %{b: 1.0}}
+      iex> Cldr.Map.floatize_values %{a: %{b: "1.0"}}
+      %{a: %{b: 1.0}}
 
-    iex> Cldr.Map.floatize_values %{a: %{b: "1"}}
-    %{a: %{b: 1.0}}
+      iex> Cldr.Map.floatize_values %{a: %{b: "1"}}
+      %{a: %{b: 1.0}}
 
   """
   def floatize_values(map, options \\ []) do
@@ -376,8 +376,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.stringify_keys %{a: %{"1" => "value"}}
-    %{"a" => %{"1" => "value"}}
+      iex> Cldr.Map.stringify_keys %{a: %{"1" => "value"}}
+      %{"a" => %{"1" => "value"}}
 
   """
   def stringify_keys(map, options \\ []) do
@@ -396,8 +396,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.stringify_values %{a: %{"1" => :value}}
-    %{a: %{"1" => "value"}}
+      iex> Cldr.Map.stringify_values %{a: %{"1" => :value}}
+      %{a: %{"1" => "value"}}
 
   """
   def stringify_values(map, options \\ []) do
@@ -414,8 +414,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.underscore_keys %{"a" => %{"thisOne" => "value"}}
-    %{"a" => %{"this_one" => "value"}}
+      iex> Cldr.Map.underscore_keys %{"a" => %{"thisOne" => "value"}}
+      %{"a" => %{"this_one" => "value"}}
 
   """
   def underscore_keys(map, options \\ []) when is_map(map) or is_nil(map) do
@@ -436,8 +436,8 @@ defmodule Cldr.Map do
 
   ## Example
 
-    iex> Cldr.Map.rename_keys %{"a" => %{"this_one" => "value"}}, "this_one", "that_one"
-    %{"a" => %{"that_one" => "value"}}
+      iex> Cldr.Map.rename_keys %{"a" => %{"this_one" => "value"}}, "this_one", "that_one"
+      %{"a" => %{"that_one" => "value"}}
 
   """
   def rename_keys(map, from, to, options \\ []) do
@@ -470,11 +470,11 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> Cldr.Map.underscore "thisThat"
-    "this_that"
+      iex> Cldr.Map.underscore "thisThat"
+      "this_that"
 
-    iex> Cldr.Map.underscore "This_That"
-    "this_that"
+      iex> Cldr.Map.underscore "This_That"
+      "this_that"
 
   """
   @spec underscore(string :: String.t() | atom()) :: String.t()
@@ -533,8 +533,8 @@ defmodule Cldr.Map do
 
   ## Examples
 
-    iex> Cldr.Map.remove_leading_underscores %{"a" => %{"_b" => "b"}}
-    %{"a" => %{"b" => "b"}}
+      iex> Cldr.Map.remove_leading_underscores %{"a" => %{"_b" => "b"}}
+      %{"a" => %{"b" => "b"}}
 
   """
   def remove_leading_underscores(map, options \\ []) do
