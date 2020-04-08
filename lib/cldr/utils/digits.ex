@@ -493,24 +493,25 @@ defmodule Cldr.Digits do
   [1/2, 1) or 0, and value = frac*(2^exp).
   """
 
-  defp frexp(value) do
+  @doc false
+  def frexp(value) do
     <<sign::1, exp::11, frac::52>> = <<value::float>>
     frexp(sign, frac, exp)
   end
 
-  defp frexp(_Sign, 0, 0) do
+  def frexp(_Sign, 0, 0) do
     {0.0, 0}
   end
 
   # Handle denormalised values
-  defp frexp(sign, frac, 0) do
+  def frexp(sign, frac, 0) do
     exp = bitwise_length(frac)
     <<f::float>> = <<sign::1, @float_bias::11, frac - 1::52>>
     {f, -@float_bias - 52 + exp}
   end
 
   # Handle normalised values
-  defp frexp(sign, frac, exp) do
+  def frexp(sign, frac, exp) do
     <<f::float>> = <<sign::1, @float_bias::11, frac::52>>
     {f, exp - @float_bias}
   end

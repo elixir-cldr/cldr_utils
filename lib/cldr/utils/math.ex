@@ -810,13 +810,13 @@ defmodule Cldr.Math do
   end
 
   # Consistent with Kernel.round/1
-  def round(number, 0 = places, :half_up = mode) when is_float(number) do
-    number
-    |> Decimal.from_float()
-    |> Decimal.round(places, mode)
-    |> to_float
-    |> trunc
-  end
+  # def round(number, 0 = places, :half_up = mode) when is_float(number) do
+  #   number
+  #   |> Decimal.from_float()
+  #   |> Decimal.round(places, mode)
+  #   |> to_float
+  #   |> trunc
+  # end
 
   def round(number, places, mode) when is_float(number) do
     number
@@ -837,8 +837,8 @@ defmodule Cldr.Math do
   defp round_digits(digits_t, %{decimals: true}), do: digits_t
 
   # rounded away all the decimals... return 0
-  defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, true}
-  defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, true}
+  defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
+  defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
 
   defp round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
     {digits, place, sign} = do_round(digits_t, dp + place - 1, options)
@@ -850,19 +850,21 @@ defmodule Cldr.Math do
     {List.flatten(digits), place, sign}
   end
 
-  defp do_round({digits, place, positive}, round_at, %{rounding: rounding}) do
+  defp do_round({digits, place, sign}, round_at, %{rounding: rounding}) do
+    positive = sign > 0
+
     case Enum.split(digits, round_at) do
       {l, [least_sig | [tie | rest]]} ->
         case do_incr(l, least_sig, increment?(positive, least_sig, tie, rest, rounding)) do
-          [:rollover | digits] -> {digits, place + 1, positive}
-          digits -> {digits, place, positive}
+          [:rollover | digits] -> {digits, place + 1, sign}
+          digits -> {digits, place, sign}
         end
 
       {l, [least_sig | []]} ->
-        {[l, least_sig], place, positive}
+        {[l, least_sig], place, sign}
 
       {l, []} ->
-        {l, place, positive}
+        {l, place, sign}
     end
   end
 
