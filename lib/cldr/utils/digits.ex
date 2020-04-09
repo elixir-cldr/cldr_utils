@@ -484,14 +484,12 @@ defmodule Cldr.Digits do
   # FIXME: We don't handle +/-inf and NaN inputs. Not believed to be an issue in
   # Elixir, but beware future-self reading this...
 
-  _ = """
-  The frexp() function is as per the clib function with the same name. It breaks
-  the floating-point number value into a normalized fraction and an integral
-  power of 2.
-
-  Returns {frac, exp}, where the magnitude of frac is in the interval
-  [1/2, 1) or 0, and value = frac*(2^exp).
-  """
+  # The frexp() function is as per the clib function with the same name. It breaks
+  # the floating-point number value into a normalized fraction and an integral
+  # power of 2.
+  #
+  # Returns {frac, exp}, where the magnitude of frac is in the interval
+  # [1/2, 1) or 0, and value = frac*(2^exp).
 
   @doc false
   def frexp(value) do

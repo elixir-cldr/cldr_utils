@@ -42,7 +42,7 @@ defmodule Cldr.Utils.MixProject do
       # {:decimal, "~> 1.6 or ~> 1.9-rc or ~> 2.0-rc or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test},
-      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:benchee, "~> 1.0", only: [:dev], runtime: false, optional: true}
     ]
   end
