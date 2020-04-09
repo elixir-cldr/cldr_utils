@@ -42,6 +42,7 @@ defmodule Cldr.Math do
     of Decimal is configured
 
   """
+  @spec decimal_compare(Decimal.t(), Decimal.t()) :: :eq | :lt | :gt
   if Version.match?(@decimal_version, "~> 1.6 or ~> 1.9.0-rc") do
     def decimal_compare(d1, d2) do
       Decimal.cmp(d1, d2)
@@ -838,6 +839,14 @@ defmodule Cldr.Math do
     number
     |> Digits.to_digits()
     |> round_digits(%{decimals: places, rounding: mode})
+    |> Digits.to_number(number)
+  end
+
+  @doc false
+  def round_scientific(number, places, mode) when is_float(number) do
+    number
+    |> Digits.to_digits()
+    |> round_digits(%{scientific: places, rounding: mode})
     |> Digits.to_number(number)
   end
 
