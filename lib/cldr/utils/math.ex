@@ -525,7 +525,6 @@ defmodule Cldr.Math do
     number * power(number, n - 1)
   end
 
-  #
   # Precompute powers of 10 up to 10^326
   # FIXME: duplicating existing function in Float, which only goes up to 15.
   Enum.reduce(0..326, 1, fn x, acc ->
@@ -741,11 +740,8 @@ defmodule Cldr.Math do
     @rounding_modes
   end
 
-  # Originally adapted from https://github.com/ewildgoose/elixir-float_pp but the
-  # results were inconsistent with `Decimal` so now all rounding is done in decimal.
-  # This incurs conversion which, especially for floats, is not a perfect solution.
-  # Since this function is here primarily to support number formatting in Cldr we
-  # consider it currently acceptable.
+  # Originally adapted from https://github.com/ewildgoose/elixir-float_pp
+  # Thanks for making htis like @ewildgoose
 
   @doc """
   Round a number to an arbitrary precision using one of several rounding algorithms.
@@ -760,7 +756,7 @@ defmodule Cldr.Math do
   * `places` is an integer number of places to round to
 
   * `mode` is the rounding mode to be applied.  The
-    default is `half_even`
+    default is `:half_even`
 
   ## Rounding algorithms
 
@@ -790,7 +786,7 @@ defmodule Cldr.Math do
   ## Notes
 
   * When the `number` is a `Decimal`, the results are identical
-    to `Decimal.round/3`
+    to `Decimal.round/3` (delegates to `Decimal` in these cases)
 
   * When the `number` is a `float`, `places` is `0` and `mode`
     is `:half_up` then the result is the same as `Kernel.trunc/1`
@@ -808,15 +804,6 @@ defmodule Cldr.Math do
     |> Decimal.round(places, mode)
     |> Decimal.to_integer()
   end
-
-  # Consistent with Kernel.round/1
-  # def round(number, 0 = places, :half_up = mode) when is_float(number) do
-  #   number
-  #   |> Decimal.from_float()
-  #   |> Decimal.round(places, mode)
-  #   |> to_float
-  #   |> trunc
-  # end
 
   def round(number, places, mode) when is_float(number) do
     number
@@ -851,11 +838,9 @@ defmodule Cldr.Math do
   end
 
   defp do_round({digits, place, sign}, round_at, %{rounding: rounding}) do
-    positive = sign > 0
-
     case Enum.split(digits, round_at) do
       {l, [least_sig | [tie | rest]]} ->
-        case do_incr(l, least_sig, increment?(positive, least_sig, tie, rest, rounding)) do
+        case do_incr(l, least_sig, increment?(sign == 1, least_sig, tie, rest, rounding)) do
           [:rollover | digits] -> {digits, place + 1, sign}
           digits -> {digits, place, sign}
         end

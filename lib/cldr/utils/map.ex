@@ -210,7 +210,7 @@ defmodule Cldr.Map do
     deep_map(map, &atomize_key(&1, Map.new(options)), options)
   end
 
-  def atomize_keys({k, value}, options) when is_map(value) do
+  def atomize_keys({k, value}, options) when is_map(value) or is_list(value) do
     options = @default_atomize_options ++ options
     map_options = Map.new(options)
     {atomize_key(k, map_options), deep_map(value, &atomize_key(&1, map_options), options)}
@@ -244,7 +244,7 @@ defmodule Cldr.Map do
     deep_map(map, &atomize_value(&1, Map.new(options)), options)
   end
 
-  def atomize_values({k, value}, options) when is_map(value) do
+  def atomize_values({k, value}, options) when is_map(value) or is_list(value) do
     options = @default_atomize_options ++ options
     map_options = Map.new(options)
     {k, deep_map(value, &atomize_value(&1, map_options), options)}
@@ -273,8 +273,14 @@ defmodule Cldr.Map do
       %{a: %{1 => "value"}}
 
   """
-  def integerize_keys(map, options \\ []) do
+  def integerize_keys(map, options \\ [])
+
+  def integerize_keys(map, options) when is_map(map) or is_list(map)do
     deep_map(map, &integerize_key/1, options)
+  end
+
+  def integerize_keys({k, value}, options) when is_map(value) or is_list(value) do
+    {integerize_key(k), deep_map(value, &integerize_key/1, options)}
   end
 
   @doc """
@@ -330,8 +336,14 @@ defmodule Cldr.Map do
       %{a: %{1.0 => "value"}}
 
   """
-  def floatize_keys(map, options \\ []) do
+  def floatize_keys(map, options \\ [])
+
+  def floatize_keys(map, options)  when is_map(map) or is_list(map)do
     deep_map(map, &floatize_key/1, options)
+  end
+
+  def floatize_keys({k, value}, options) when is_map(value) or is_list(value) do
+    {floatize_key(k), deep_map(value, &floatize_key/1, options)}
   end
 
   @doc """
@@ -380,8 +392,14 @@ defmodule Cldr.Map do
       %{"a" => %{"1" => "value"}}
 
   """
-  def stringify_keys(map, options \\ []) do
+  def stringify_keys(map, options \\ [])
+
+  def stringify_keys(map, options) when is_map(map) or is_list(map)do
     deep_map(map, &stringify_key/1, options)
+  end
+
+  def stringify_keys({k, value}, options) when is_map(value) or is_list(value) do
+    {stringify_key(k), deep_map(value, &stringify_key/1, options)}
   end
 
   @doc """
@@ -418,8 +436,14 @@ defmodule Cldr.Map do
       %{"a" => %{"this_one" => "value"}}
 
   """
-  def underscore_keys(map, options \\ []) when is_map(map) or is_nil(map) do
+  def underscore_keys(map, options \\ [])
+
+  def underscore_keys(map, options) when is_map(map) or is_nil(map) do
     deep_map(map, &underscore_key/1, options)
+  end
+
+  def underscore_keys({k, value}, options) when is_map(value) or is_list(value) do
+    {underscore_key(k), deep_map(value, &underscore_key/1, options)}
   end
 
   @doc """
@@ -440,7 +464,7 @@ defmodule Cldr.Map do
       %{"a" => %{"that_one" => "value"}}
 
   """
-  def rename_keys(map, from, to, options \\ []) do
+  def rename_keys(map, from, to, options \\ []) when is_map(map) or is_list(map) do
     renamer = fn
       {^from, v} -> {to, v}
       other -> other
