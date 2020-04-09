@@ -23,6 +23,35 @@ defmodule Cldr.Math do
   @two Decimal.new(2)
   @ten Decimal.new(10)
 
+  @decimal_version Application.ensure_all_started(:decimal) &&
+                     Application.spec(:decimal)
+                     |> Keyword.get(:vsn)
+                     |> List.to_string()
+
+  @doc """
+  Compares two Decimals while managing the
+  differences between versions 1.x and 2.x
+
+  ## Arguments
+
+  * `d1` and `d2` are Decimals
+
+  ## Returns
+
+  * `:lt`, `:eq` or `:gt` no matter which version
+    of Decimal is configured
+
+  """
+  if Version.match?(@decimal_version, "~> 1.6 or ~> 1.9.0-rc") do
+    def decimal_compare(d1, d2) do
+      Decimal.cmp(d1, d2)
+    end
+  else
+    def decimal_compare(d1, d2) do
+      Decimal.compare(d1, d2)
+    end
+  end
+
   @doc """
   Returns the default number of rounding digits
   """
@@ -850,22 +879,6 @@ defmodule Cldr.Math do
 
       {l, []} ->
         {l, place, sign}
-    end
-  end
-
-  @doc false
-  @decimal_version Application.ensure_all_started(:decimal) &&
-                     Application.spec(:decimal)
-                     |> Keyword.get(:vsn)
-                     |> List.to_string()
-
-  if Version.match?(@decimal_version, "~> 1.6 or ~> 1.9.0-rc") do
-    def decimal_compare(d1, d2) do
-      Decimal.cmp(d1, d2)
-    end
-  else
-    def decimal_compare(d1, d2) do
-      Decimal.compare(d1, d2)
     end
   end
 
