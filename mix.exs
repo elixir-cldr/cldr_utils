@@ -42,7 +42,8 @@ defmodule Cldr.Utils.MixProject do
       # {:decimal, "~> 1.6 or ~> 1.9-rc or ~> 2.0-rc or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test},
-      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc", only: [:dev], runtime: false},
+      {:benchee, "~> 1.0", only: [:dev], runtime: false, optional: true}
     ]
   end
 
@@ -83,7 +84,7 @@ defmodule Cldr.Utils.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "mix", "test"]
-  defp elixirc_paths(:dev), do: ["lib", "mix", "bench"]
+  defp elixirc_paths(:dev), do: ["lib", "mix", "benchee"]
   defp elixirc_paths(_), do: ["lib"]
 
   def aliases do
