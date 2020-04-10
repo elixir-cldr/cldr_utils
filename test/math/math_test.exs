@@ -30,6 +30,14 @@ defmodule Math.Test do
     assert Cldr.Math.round(1.406, 2, :half_even) == 1.41
   end
 
+  test "rounding floats with zero decimals" do
+    assert Cldr.Math.round(3.6000000000000085) == 4.0
+  end
+
+  test "rounding a float < 0 with zero decimals" do
+    assert Cldr.Math.round(0.959999999999809) == 1.0
+  end
+
   test "integer number of digits for a decimal fixnum" do
     decimal = Decimal.from_float(1234.5678)
     assert Digits.number_of_integer_digits(decimal) == 4

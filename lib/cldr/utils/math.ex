@@ -862,8 +862,16 @@ defmodule Cldr.Math do
   defp round_digits(digits_t, %{decimals: true}), do: digits_t
 
   # rounded away all the decimals... return 0
-  defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
-  defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
+  # NOTE THESE IMPLY THAT ANY NUMBER LESS THAN ZERO THAT SHOULD ROUND TO 1
+  # WILL RETURN 0 which is not what we want!
+
+  # defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
+  # defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
+
+  defp round_digits({_, place, _} = digits_t, %{decimals: dp} = options) when dp + place <= 0 do
+    {digits, place, sign} = do_round(digits_t, dp, options)
+    {List.flatten(digits), place, sign}
+  end
 
   defp round_digits(digits_t = {_, place, _}, options = %{decimals: dp}) do
     {digits, place, sign} = do_round(digits_t, dp + place - 1, options)
@@ -878,15 +886,25 @@ defmodule Cldr.Math do
   defp do_round({digits, place, sign}, round_at, %{rounding: rounding}) do
     case Enum.split(digits, round_at) do
       {l, [least_sig | [tie | rest]]} ->
+        # IO.inspect {l, [least_sig | [tie | rest]]}, label: "Case 1"
         case do_incr(l, least_sig, increment?(sign == 1, least_sig, tie, rest, rounding)) do
           [:rollover | digits] -> {digits, place + 1, sign}
           digits -> {digits, place, sign}
         end
 
+      {[] = l, [least_sig | []]} ->
+        # IO.inspect  {l, [least_sig | []]}, label: "Case 2"
+        case do_incr(l, least_sig, increment?(sign == 1, least_sig, 0, [], rounding)) do
+          [:rollover | digits] -> {digits, place + 1, sign}
+          digits -> {digits, place, sign}
+        end
+
       {l, [least_sig | []]} ->
+        # IO.inspect  {l, [least_sig | []]}, label: "Case 4"
         {[l, least_sig], place, sign}
 
       {l, []} ->
+        # IO.inspect {l, []}, label: "Case 3"
         {l, place, sign}
     end
   end
