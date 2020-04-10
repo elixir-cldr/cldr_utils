@@ -13,6 +13,10 @@ defmodule Cldr.Math.RoundingTest do
     round(number, precision, :floor)
   end
 
+  test "rounding to less than the precision of the number returns 0" do
+    assert Cldr.Math.round(1.235e-4, 3, :half_even) == 0.0
+  end
+
   test "Simple round :half_up" do
     assert 1.21 == round(1.205, 2)
     assert 1.22 == round(1.215, 2)

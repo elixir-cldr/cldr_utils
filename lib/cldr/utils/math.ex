@@ -868,7 +868,12 @@ defmodule Cldr.Math do
   # defp round_digits(_, %{scientific: dp}) when dp <= 0, do: {[0], 1, 1}
   # defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0, do: {[0], 1, 1}
 
+  defp round_digits({_, place, _}, %{decimals: dp}) when dp + place <= 0 and place < 0 do
+    {[0], 1, 1}
+  end
+
   defp round_digits({_, place, _} = digits_t, %{decimals: dp} = options) when dp + place <= 0 do
+    # IO.inspect dp + place, label: "Round at"
     {digits, place, sign} = do_round(digits_t, dp, options)
     {List.flatten(digits), place, sign}
   end
