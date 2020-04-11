@@ -18,6 +18,12 @@ defmodule Math.Test do
     end
   end
 
+  property "check rounding to zero places for floats is the same as Float.round/1" do
+    check all(float <- GenerateNumber.float(), max_runs: 1_000) do
+      assert Float.round(float) == Cldr.Math.round(float, 0, :half_up)
+    end
+  end
+
   test "integer number of digits for a decimal integer" do
     decimal = Decimal.new(1234)
     assert Digits.number_of_integer_digits(decimal) == 4

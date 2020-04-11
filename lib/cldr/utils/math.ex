@@ -821,6 +821,11 @@ defmodule Cldr.Math do
   * When the `number` is a `float`, `places` is `0` and `mode`
     is `:half_up` then the result is the same as `Kernel.trunc/1`
 
+  * The results of rounding for `floats` may not return the same
+    result as `Float.round/2`. `Float.round/2` operates on the
+    binary representation. This implementation operates on
+    a decimal representation.
+
   """
   def round(number, places \\ 0, mode \\ :half_even)
 
