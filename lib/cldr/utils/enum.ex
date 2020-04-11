@@ -1,4 +1,4 @@
-defmodule Cldr.List do
+defmodule Cldr.Enum do
 
   @doc """
   Very simple reduce that passes both the head and the tail
