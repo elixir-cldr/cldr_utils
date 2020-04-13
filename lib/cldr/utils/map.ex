@@ -10,7 +10,6 @@ defmodule Cldr.Map do
   """
   def identity(x), do: x
 
-
   @default_deep_map_options [level: 1..1_000_000]
   @starting_level 1
   @max_level 1_000_000
@@ -275,7 +274,7 @@ defmodule Cldr.Map do
   """
   def integerize_keys(map, options \\ [])
 
-  def integerize_keys(map, options) when is_map(map) or is_list(map)do
+  def integerize_keys(map, options) when is_map(map) or is_list(map) do
     deep_map(map, &integerize_key/1, options)
   end
 
@@ -338,7 +337,7 @@ defmodule Cldr.Map do
   """
   def floatize_keys(map, options \\ [])
 
-  def floatize_keys(map, options)  when is_map(map) or is_list(map)do
+  def floatize_keys(map, options) when is_map(map) or is_list(map) do
     deep_map(map, &floatize_key/1, options)
   end
 
@@ -394,7 +393,7 @@ defmodule Cldr.Map do
   """
   def stringify_keys(map, options \\ [])
 
-  def stringify_keys(map, options) when is_map(map) or is_list(map)do
+  def stringify_keys(map, options) when is_map(map) or is_list(map) do
     deep_map(map, &stringify_key/1, options)
   end
 
@@ -563,7 +562,7 @@ defmodule Cldr.Map do
   """
   def remove_leading_underscores(map, options \\ []) do
     remover = fn
-      {k, v} when is_binary(k)-> {String.trim_leading(k, "_"), v}
+      {k, v} when is_binary(k) -> {String.trim_leading(k, "_"), v}
       other -> other
     end
 
@@ -674,13 +673,14 @@ defmodule Cldr.Map do
   end
 
   defp validate_options({key_function, value_function}, options)
-      when is_function(key_function) and is_function(value_function) do
+       when is_function(key_function) and is_function(value_function) do
     validate_options(options)
   end
 
   defp validate_options(function, _options) do
-    raise ArgumentError, "function parameter must be a function or a 2-tuple " <>
-    "consisting of a key_function and a value_function. Found #{inspect function}"
+    raise ArgumentError,
+          "function parameter must be a function or a 2-tuple " <>
+            "consisting of a key_function and a value_function. Found #{inspect(function)}"
   end
 
   defp validate_options(options) do
@@ -837,5 +837,4 @@ defmodule Cldr.Map do
   defp process_element?(x, only, except) do
     x in only and x not in except
   end
-
 end

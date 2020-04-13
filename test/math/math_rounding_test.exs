@@ -70,5 +70,4 @@ defmodule Cldr.Math.RoundingTest do
     assert -1.21 == floor(-1.205, 2)
     assert -1.21 == floor(-1.206, 2)
   end
-
 end
