@@ -19,9 +19,9 @@ defmodule Cldr.Enum do
   def reduce_peeking(list, acc, fun),
     do: reduce_peeking(list, {:cont, acc}, fun) |> elem(1)
 
-  def make_pyramid([head]),
+  def combine_list([head]),
     do: [to_string(head)]
 
-  def make_pyramid([head | [next | tail]]),
-    do: [to_string(head) | make_pyramid(["#{head}_#{next}" | tail])]
+  def combine_list([head | [next | tail]]),
+    do: [to_string(head) | combine_list(["#{head}_#{next}" | tail])]
 end
