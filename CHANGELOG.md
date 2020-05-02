@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.9.1
+
+This is the changelog for Cldr Utils v2.9.1 released on May 3rd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix compatibility with `ex_cldr` releases up to 2.13.0.  Thanks to @hl for the repot.
+
 ## Changelog for Cldr Utils version 2.9.0
 
 This is the changelog for Cldr Utils v2.9.0 released on May 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

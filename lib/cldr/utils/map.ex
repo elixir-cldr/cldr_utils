@@ -215,6 +215,15 @@ defmodule Cldr.Map do
     {atomize_key(k, map_options), deep_map(value, &atomize_key(&1, map_options), options)}
   end
 
+  # For compatibility with older
+  # versions of ex_cldr that expect this
+  # behaviour
+
+  # TODO Fix Cldr.Config.get_locale to not make this assumption
+  def atomize_keys(other, _options) do
+    other
+  end
+
   @doc """
   Transforms a `map`'s `String.t` values to `atom()` values.
 
