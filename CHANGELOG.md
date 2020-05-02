@@ -4,7 +4,7 @@ This is the changelog for Cldr Utils v2.9.1 released on May 3rd, 2020.  For olde
 
 ### Bug Fixes
 
-* Fix compatibility with `ex_cldr` releases up to 2.13.0.  Thanks to @hl for the repot.
+* Fix compatibility with `ex_cldr` releases up to 2.13.0.  Thanks to @hl for the report. Fixes #3.
 
 ## Changelog for Cldr Utils version 2.9.0
 
