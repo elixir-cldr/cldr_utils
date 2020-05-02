@@ -1,12 +1,14 @@
 ## Changelog for Cldr Utils version 2.9.0
 
-This is the changelog for Cldr Utils v2.9.0 released on _______, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.9.0 released on May 2nd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Enhancements
 
-* Adds `:only` and `:except` options to `Cldr.Map.atomize_keys/3`, `Cldr.Map.atomize_values/3`, `Cldr.Map.integerize_keys/3` and `Cldr.Map.integerize_values/3`
+* Add `:level`, `:only` and `:except` options to `Cldr.Map.deep_map/3` and refactor functions that use it
 
-* Adds `:level` option to `Cldr.Map.deep_merge/3`
+* Add `Cldr.Enum.reduce_peeking/3` that is a simple reduce function that also passed the tail of the enum being reduced to enable a simple form of lookahead
+
+* Refactor `Cldr.Math.round/2` implementation for floating point numbers that improves efficiency by about 100% since it avoids round trip conversion to `Decimal`
 
 ## Changelog for Cldr Utils version 2.8.0
 
