@@ -1,7 +1,7 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.9.1"
+  @version "2.10.0"
 
   def project do
     [
@@ -38,8 +38,7 @@ defmodule Cldr.Utils.MixProject do
 
   defp deps do
     [
-      {:decimal, "~> 1.6"},
-      # {:decimal, "~> 1.6 or ~> 1.9-rc or ~> 2.0-rc or ~> 2.0"},
+      {:decimal, "~> 1.6 or ~> 2.0"},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},

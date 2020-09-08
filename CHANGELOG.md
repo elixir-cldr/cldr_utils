@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.10.0
+
+This is the changelog for Cldr Utils v2.10.0 released on September 8th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Supports `Decimal` 1.6 or greater or `Decimal` 2.x or later
+
 ## Changelog for Cldr Utils version 2.9.1
 
 This is the changelog for Cldr Utils v2.9.1 released on May 3rd, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
