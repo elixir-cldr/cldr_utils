@@ -9,4 +9,8 @@ defmodule Cldr.Decimal do
       Decimal.reduce(decimal)
     end
   end
+
+  def compare(decimal1, decimal2) do
+    Cldr.Math.decimal_compare(decimal1, decimal2)
+  end
 end
