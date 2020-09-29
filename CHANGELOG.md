@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.13.0
+
+This is the changelog for Cldr Utils v2.12.0 released on September 30th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Add `Cldr.Decimal.parse/1` as a compatibiity layer for Decimal 1.x and 2.x
+
 ## Changelog for Cldr Utils version 2.12.0
 
 This is the changelog for Cldr Utils v2.12.0 released on September 29th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
