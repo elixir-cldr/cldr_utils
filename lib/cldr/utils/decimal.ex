@@ -5,8 +5,9 @@ defmodule Cldr.Decimal do
   1.x and 2.x
 
   """
-  Code.ensure_loaded(Decimal)
-  decimal_version = (Application.spec(:decimal, :vsn) || '1.9.0') |> List.to_string
+  decimal_version = Application.ensure_all_started(:decimal) &&
+                     Application.spec(:decimal, :vsn)
+                     |> List.to_string()
 
   # To cater for both Decimal 1.x and 2.x
   if Code.ensure_loaded?(Decimal) && function_exported?(Decimal, :normalize, 1) do
@@ -19,8 +20,15 @@ defmodule Cldr.Decimal do
     end
   end
 
-  def compare(decimal1, decimal2) do
-    Cldr.Math.decimal_compare(decimal1, decimal2)
+  @spec compare(Decimal.t(), Decimal.t()) :: :eq | :lt | :gt
+  if Version.match?(decimal_version, "~> 1.6 or ~> 1.9.0-rc or ~> 1.9") do
+    def compare(d1, d2) do
+      Decimal.cmp(d1, d2)
+    end
+  else
+    def compare(d1, d2) do
+      Decimal.compare(d1, d2)
+    end
   end
 
   if Version.match?(decimal_version, "~> 2.0") do
