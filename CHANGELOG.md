@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.12.0
+
+This is the changelog for Cldr Utils v2.12.0 released on September 29th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Add `Cldr.Digit.number_of_trailing_zeros/1` to calculate the number of trailing zeros in an integer
+
 ## Changelog for Cldr Utils version 2.11.0
 
 This is the changelog for Cldr Utils v2.11.0 released on September 25th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

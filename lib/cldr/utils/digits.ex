@@ -270,6 +270,33 @@ defmodule Cldr.Digits do
   end
 
   @doc """
+  Returns the number of trailing zeros in an
+  integer number.
+
+  * `number` is an integer.
+
+  Returns the number of trailing zeros in the fractional
+  part of an integer.
+
+  ## Examples
+
+      iex> Cldr.Digits.number_of_trailing_zeros(123000)
+      3
+
+  """
+  def number_of_trailing_zeros(number) when is_integer(number) do
+    {integer_digits, _fraction_digits, _sign} = to_tuple(number)
+    number_of_trailing_zeros(integer_digits)
+  end
+
+  def number_of_trailing_zeros(number) when is_list(number) do
+    number
+    |> Enum.reverse
+    |> Enum.take_while(fn c -> c == ?0 or c == 0 end)
+    |> length
+  end
+
+  @doc """
   Converts given number to a list representation.
 
   Given an IEEE 754 float, computes the shortest, correctly rounded list of digits

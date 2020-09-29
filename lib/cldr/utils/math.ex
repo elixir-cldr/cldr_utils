@@ -557,6 +557,7 @@ defmodule Cldr.Math do
 
   # Precompute powers of 10 up to 10^326
   # FIXME: duplicating existing function in Float, which only goes up to 15.
+  @doc false
   Enum.reduce(0..326, 1, fn x, acc ->
     def power_of_10(unquote(x)), do: unquote(acc)
     acc * 10
