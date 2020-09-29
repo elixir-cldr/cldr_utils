@@ -5,7 +5,8 @@ defmodule Cldr.Decimal do
   1.x and 2.x
 
   """
-  decimal_version = Keyword.get(Application.spec(:decimal), :vsn) |> List.to_string
+  Code.ensure_loaded(Decimal)
+  decimal_version = (Application.spec(:decimal, :vsn) || '1.9.0') |> List.to_string
 
   # To cater for both Decimal 1.x and 2.x
   if Code.ensure_loaded?(Decimal) && function_exported?(Decimal, :normalize, 1) do
