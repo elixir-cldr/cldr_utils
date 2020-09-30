@@ -23,20 +23,8 @@ defmodule Cldr.Math do
   @two Decimal.new(2)
   @ten Decimal.new(10)
 
-  @doc """
-  Compares two Decimals while managing the
-  differences between versions 1.x and 2.x
-
-  ## Arguments
-
-  * `d1` and `d2` are Decimals
-
-  ## Returns
-
-  * `:lt`, `:eq` or `:gt` no matter which version
-    of Decimal is configured
-
-  """
+  @doc false
+  @deprecated "Use Cldr.Decimal.compare/2"
   def decimal_compare(d1, d2) do
     Cldr.Decimal.compare(d1, d2)
   end
@@ -170,7 +158,7 @@ defmodule Cldr.Math do
   def amod(x, y) do
     case mod = mod(x, y) do
       %Decimal{} = decimal_mod ->
-        if decimal_compare(decimal_mod, @decimal_zero) == :eq, do: y, else: mod
+        if Cldr.Decimal.compare(decimal_mod, @decimal_zero) == :eq, do: y, else: mod
 
       _ ->
         if mod == 0, do: y, else: mod
@@ -679,7 +667,7 @@ defmodule Cldr.Math do
       |> Decimal.sub(old_estimate)
       |> Decimal.abs()
 
-    if decimal_compare(diff, old_estimate) == :lt || decimal_compare(diff, old_estimate) == :eq do
+    if Cldr.Decimal.compare(diff, old_estimate) == :lt || Cldr.Decimal.compare(diff, old_estimate) == :eq do
       estimate
     else
       Decimal.div(number, Decimal.mult(@two, estimate))
@@ -746,7 +734,7 @@ defmodule Cldr.Math do
     d3 = Decimal.sub(d2, root)
     delta = Decimal.mult(d1, d3)
 
-    if decimal_compare(delta, @decimal_root_precision) == :gt do
+    if Cldr.Decimal.compare(delta, @decimal_root_precision) == :gt do
       do_root(number, nth, Decimal.add(root, delta))
     else
       root

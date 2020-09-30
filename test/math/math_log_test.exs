@@ -12,7 +12,7 @@ defmodule Math.Log.Test do
     test "that decimal log(e) is correct for #{inspect(sample)}" do
       calc = Cldr.Math.log(Decimal.new(unquote(to_string(sample)))) |> Decimal.round(@round)
       sample = Decimal.new(unquote(to_string(result))) |> Decimal.round(@round)
-      assert Cldr.Math.decimal_compare(calc, sample) == :eq
+      assert Cldr.Decimal.compare(calc, sample) == :eq
     end
   end)
 
@@ -33,7 +33,7 @@ defmodule Math.Log.Test do
 
   # Testing large decimals that are beyond the precision of a float
   test "log Decimal.new(\"1.33333333333333333333333333333333\")" do
-    assert Cldr.Math.decimal_compare(
+    assert Cldr.Decimal.compare(
              Cldr.Math.log(Decimal.new("1.33333333333333333333333333333333")),
              Decimal.new("0.2876820724291554672132526174")
            ) == :eq

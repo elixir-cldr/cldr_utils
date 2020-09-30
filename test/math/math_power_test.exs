@@ -37,24 +37,24 @@ defmodule Math.Power.Test do
 
   test "Short cut decimal power of 10 for a positive number" do
     p = Cldr.Math.power(Decimal.new(10), 2)
-    assert Cldr.Math.decimal_compare(p, Decimal.new(100)) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new(100)) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), 3)
-    assert Cldr.Math.decimal_compare(p, Decimal.new(1000)) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new(1000)) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), 4)
-    assert Cldr.Math.decimal_compare(p, Decimal.new(10000)) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new(10000)) == :eq
   end
 
   test "Short cut decimal power of 10 for a negative number" do
     p = Cldr.Math.power(Decimal.new(10), -2)
-    assert Cldr.Math.decimal_compare(p, Decimal.new("0.01")) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new("0.01")) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), -3)
-    assert Cldr.Math.decimal_compare(p, Decimal.new("0.001")) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new("0.001")) == :eq
 
     p = Cldr.Math.power(Decimal.new(10), -4)
-    assert Cldr.Math.decimal_compare(p, Decimal.new("0.0001")) == :eq
+    assert Cldr.Decimal.compare(p, Decimal.new("0.0001")) == :eq
   end
 
   test "A specific bug fix" do
@@ -62,7 +62,7 @@ defmodule Math.Power.Test do
     b = Decimal.new("0.00001242")
     x = Decimal.sub(a, b)
 
-    assert Cldr.Math.decimal_compare(Cldr.Math.power(x, 2), Decimal.new("0.00000000000001")) ==
+    assert Cldr.Decimal.compare(Cldr.Math.power(x, 2), Decimal.new("0.00000000000001")) ==
              :eq
   end
 end
