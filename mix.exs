@@ -1,7 +1,7 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.13.1"
+  @version "2.13.2"
 
   def project do
     [

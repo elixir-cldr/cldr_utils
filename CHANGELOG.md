@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.13.2
+
+This is the changelog for Cldr Utils v2.13.2 released on October 20th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug fixes
+
+* Fix unused variable warning on OTP versions that do not include `:persistent_term` module. Thanks to @kianmeng.
+
 ## Changelog for Cldr Utils version 2.13.1
 
 This is the changelog for Cldr Utils v2.13.1 released on September 30th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
