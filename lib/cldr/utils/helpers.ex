@@ -48,7 +48,7 @@ defmodule Cldr.Helpers do
       end
 
       @doc false
-      def put_term(key, value) do
+      def put_term(_key, value) do
         value
       end
   end
