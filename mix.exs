@@ -26,19 +26,21 @@ defmodule Cldr.Utils.MixProject do
 
   defp description do
     """
-    Map, Calendar, Digits, Macro, Math and String helpers for ex_cldr
+    Map, Calendar, Digits, Decimal, HTTP, Macro, Math and String helpers for ex_cldr
     """
   end
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :inets, :ssl]
     ]
   end
 
   defp deps do
     [
       {:decimal, "~> 1.6 or ~> 2.0"},
+      {:castore, "~> 0.1", optional: true},
+      {:certifi, "~> 2.5", optional: true},
       {:ex_doc, "~> 0.18", only: [:release, :dev]},
       {:stream_data, "~> 0.4", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
