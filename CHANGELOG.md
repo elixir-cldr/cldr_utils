@@ -1,3 +1,13 @@
+## Changelog for Cldr Utils version 2.13.3
+
+This is the changelog for Cldr Utils v2.13.3 released on February 17th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug fixes
+
+* Fix `Cldr.Math.power/2` when both arguments are Decimal and the power is negative.
+
+* Update the docs for `Cldr.Math.round_significant/2` to note that rounding floats to significant digits cannot always return the expected precision since floats cannot represent all decimal numbers correctly.
+
 ## Changelog for Cldr Utils version 2.13.2
 
 This is the changelog for Cldr Utils v2.13.2 released on October 20th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

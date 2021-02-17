@@ -231,6 +231,25 @@ defmodule Cldr.Math do
       iex> Cldr.Math.round_significant(0.00035, 1)
       0.0004
 
+      iex> Cldr.Math.round_significant(Decimal.from_float(3.342742283480345e27), 7)
+      #Decimal<3.342742E+27>
+
+  ## Notes about precision
+
+  Since floats cannot accurately represent all decimal
+  numbers, so rounding to significant digits for a float cannot
+  always return the expected results. For example:
+
+      => Cldr.Math.round_significant(3.342742283480345e27, 7)
+      Expected result:  3.342742e27
+      Actual result: 3.3427420000000003e27
+
+  Use of `Decimal` numbers avoids this issue:
+
+      => Cldr.Math.round_significant(Decimal.from_float(3.342742283480345e27), 7)
+      Expected result:  #Decimal<3.342742E+27>
+      Actual result: #Decimal<3.342742E+27>
+
   ## More on significant digits
 
   * 3.14159 has six significant digits (all the numbers give you useful
@@ -265,21 +284,21 @@ defmodule Cldr.Math do
     counted)
 
   Many thanks to [Stackoverflow](http://stackoverflow.com/questions/202302/rounding-to-an-arbitrary-number-of-significant-digits)
+
   """
   @spec round_significant(number_or_decimal, integer) :: number_or_decimal
   def round_significant(number, n) when is_number(number) and n <= 0 do
     number
   end
 
-  def round_significant(number, n) when is_number(number) do
+  def round_significant(number, n) when is_number(number) and n > 0 do
     sign = if number < 0, do: -1, else: 1
     number = abs(number)
     d = Float.ceil(:math.log10(number))
     power = n - d
 
-    magnitude = :math.pow(10, power)
-    shifted = Float.round(number * magnitude)
-    rounded = shifted / magnitude
+    magnitude = :math.pow(10,power)
+    rounded = Float.round(number * magnitude) / magnitude
 
     sign *
       if is_integer(number) do
@@ -290,37 +309,35 @@ defmodule Cldr.Math do
   end
 
   if Code.ensure_loaded?(Decimal) and function_exported?(Decimal, :negate, 1) do
-    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 do
+    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 and n > 0 do
       round_significant(Decimal.abs(number), n)
       |> Decimal.negate()
     end
   else
-    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 do
+    def round_significant(%Decimal{sign: sign} = number, n) when sign < 0 and n > 0 do
       round_significant(Decimal.abs(number), n)
       |> Decimal.minus()
     end
   end
 
-  def round_significant(%Decimal{sign: sign} = number, n) when sign > 0 do
+  def round_significant(%Decimal{sign: sign} = number, n) when sign > 0 and n > 0 do
     d =
       number
       |> log10
       |> Decimal.round(0, :ceiling)
 
-    raised =
+    power =
       n
       |> Decimal.new()
       |> Decimal.sub(d)
+      |> Decimal.to_integer
 
-    magnitude = power(@ten, raised)
+    magnitude = power(@ten, power)
 
-    shifted =
-      number
-      |> Decimal.mult(magnitude)
-      |> Decimal.round(0)
-
-    Decimal.div(shifted, magnitude)
-    |> Decimal.mult(Decimal.new(sign))
+    number
+    |> Decimal.mult(magnitude)
+    |> Decimal.round(0)
+    |> Decimal.div(magnitude)
   end
 
   @doc """
@@ -439,12 +456,12 @@ defmodule Cldr.Math do
     @one
   end
 
-  def power(%Decimal{} = number, %Decimal{coef: n}) when n == 1 do
-    number
+  def power(%Decimal{} = number, %Decimal{sign: sign} = n) when sign < 1 do
+    Decimal.div(@one, do_power(number, Decimal.abs(n), mod(Decimal.abs(n), @two)))
   end
 
-  def power(%Decimal{} = number, %Decimal{sign: sign} = n) when sign < 1 do
-    Decimal.div(@one, do_power(number, n, mod(n, @two)))
+  def power(%Decimal{} = number, %Decimal{coef: n}) when n == 1 do
+    number
   end
 
   def power(%Decimal{} = number, %Decimal{} = n) do
