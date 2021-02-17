@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.14.1
+
+This is the changelog for Cldr Utils v2.14.1 released on February 17th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Merge the fixes from cldr_utils version 2.13.3 for `Cldr.Math.power/2`
+
 ## Changelog for Cldr Utils version 2.14.0
 
 This is the changelog for Cldr Utils v2.14.0 released on November 7th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
@@ -5,6 +13,16 @@ This is the changelog for Cldr Utils v2.14.0 released on November 7th, 2020.  Fo
 ### Enhancements
 
 * Adds `Cldr.Http.get/1` to download from `https` URLs using `:httpc` but with certificate vertification enabled (it is not enabled by default in the `:httpc` module).
+
+## Changelog for Cldr Utils version 2.13.3
+
+This is the changelog for Cldr Utils v2.13.3 released on February 17th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug fixes
+
+* Fix `Cldr.Math.power/2` when both arguments are Decimal and the power is negative.
+
+* Update the docs for `Cldr.Math.round_significant/2` to note that rounding floats to significant digits cannot always return the expected precision since floats cannot represent all decimal numbers correctly.
 
 ## Changelog for Cldr Utils version 2.13.2
 
