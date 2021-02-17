@@ -68,6 +68,7 @@ defmodule Cldr.Http do
   ```
 
   """
+  @spec get(String.t) :: {:ok, binary} | {:error, any}
 
   def get(url) when is_binary(url) do
     require Logger

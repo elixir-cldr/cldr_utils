@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.14.0
+
+This is the changelog for Cldr Utils v2.14.0 released on November 7th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Adds `Cldr.Http.get/1` to download from `https` URLs using `:httpc` but with certificate vertification enabled (it is not enabled by default in the `:httpc` module).
+
 ## Changelog for Cldr Utils version 2.13.2
 
 This is the changelog for Cldr Utils v2.13.2 released on October 20th, 2020.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
