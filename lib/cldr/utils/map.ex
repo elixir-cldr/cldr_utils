@@ -206,6 +206,8 @@ defmodule Cldr.Map do
         case process_type({k, v}, options) do
           :process ->
             [{key_function.({k, v}), value_function.({k, v})} | acc]
+          :continue ->
+            [{k, v} | acc]
           :skip ->
             [{k, v} | acc]
           :reject ->
@@ -223,6 +225,8 @@ defmodule Cldr.Map do
     case process_type(head, options) do
       :process ->
         [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
+      :continue ->
+        [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
       :skip ->
         [head | deep_map(rest, function, options, level + 1)]
       :reject ->
@@ -234,6 +238,8 @@ defmodule Cldr.Map do
     case process_type(value, options) do
       :process ->
         function.(value)
+      :continue ->
+        value
       :skip ->
         value
       :reject ->

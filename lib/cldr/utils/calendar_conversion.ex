@@ -1,4 +1,10 @@
 defmodule Cldr.Calendar.Conversion do
+  @moduledoc false
+
+  # This is a private module used only
+  # by ex_cldr during the consolidation phase
+  # of the CLDR base data
+
   def convert_eras_to_iso_days(calendar_data) do
     Enum.map(calendar_data, fn {calendar, content} ->
       {calendar, adjust_eras(content)}
