@@ -1,3 +1,11 @@
+## Changelog for Cldr Utils version 2.15.0
+
+This is the changelog for Cldr Utils v2.15.0 released on February 24th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Adds the options `:filter`, `:reject` and `:skip` to `Cldr.Map.deep_map/3` that work on entire branches of a map.
+
 ## Changelog for Cldr Utils version 2.14.1
 
 This is the changelog for Cldr Utils v2.14.1 released on February 17th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

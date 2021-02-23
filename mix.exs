@@ -1,7 +1,7 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.14.1"
+  @version "2.15.0"
 
   def project do
     [
@@ -32,7 +32,7 @@ defmodule Cldr.Utils.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :inets, :ssl, :stream_data]
+      extra_applications: [:logger, :inets, :ssl]
     ]
   end
 

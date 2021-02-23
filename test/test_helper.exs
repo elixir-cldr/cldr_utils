@@ -1,4 +1,5 @@
 ExUnit.start()
+Application.ensure_all_started(:stream_data)
 
 defmodule GenerateNumber do
   require ExUnitProperties

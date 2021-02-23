@@ -10,7 +10,7 @@ defmodule Cldr.Map do
   """
   def identity(x), do: x
 
-  @default_deep_map_options [level: 1..1_000_000]
+  @default_deep_map_options [level: 1..1_000_000, filter: [], reject: [], skip: [], only: [], except: []]
   @starting_level 1
   @max_level 1_000_000
 
@@ -33,7 +33,8 @@ defmodule Cldr.Map do
       the `key_function` will be called with the argument `key` and the value
       function will be called with the argument `value`
 
-  * `options` is a keyword list of options. The default is `[]`
+  * `options` is a keyword list of options. The default is
+    `#{inspect @default_deep_map_options}`
 
   ## Options
 
@@ -56,10 +57,33 @@ defmodule Cldr.Map do
     the current branch in the `map`. It is expected to return a `truthy`
     value that if `true` signals that the argument `function` will not be executed.
 
+  * `:filter` is a term or list of terms or a `check function`. If the
+    `key` currently being processed equals the term (or is in the list of
+    terms, or the `check_function` returns a truthy value) then this branch
+    of the map is processed by `function` and its output is included in the result.
+
+  * `:reject` is a term or list of terms or a `check function`. If the
+    `key` currently being processed equals the term (or is in the list of
+    terms, or the `check_function` returns a truthy value) then this branch
+    of the map is ommited from the mapped output.
+
+  * `:skip` is a term or list of terms or a `check function`. If the
+    `key` currently being processed equals the term (or is in the list of
+    terms, or the `check_function` returns a truthy value) then this branch
+    of the map is *not* processed by `function` but it is included in
+    the mapped result.
+
   ## Notes
 
-  If both the options `:only` and `:except` are provided then the `function`
-  is called only when a `term` meets both criteria.
+  * `:only` and `:except` operate on individual keys whereas `:filter`
+    and `:filter` and `:reject` operator on *entire branches* of a map
+
+  * If both the options `:only` and `:except` are provided then the `function`
+    is called only when a `term` meets both criteria. That means that `:except`
+    has priority over `:only`.
+
+  * If both the options `:filter` and `:reject` are provided then `:reject`
+    has priority over `:filter`.
 
   ## Returns
 
@@ -132,24 +156,61 @@ defmodule Cldr.Map do
   # Here we are in range so we conditionally execute the function
   # if the options for `:only` and `:except` are matched
   defp deep_map(map, function, options, level) when is_map(map) and is_function(function) do
-    Enum.map(map, fn
-      {k, v} when is_map(v) or is_list(v) ->
-        maybe_execute(function, {k, deep_map(v, function, options, level + 1)}, options)
+    Enum.reduce(map, [], fn
+      {k, v}, acc when is_map(v) or is_list(v) ->
+        case process_type({k, v}, options) do
+          :process ->
+            v = deep_map(v, function, options, level + 1)
+            [function.({k, v}) | acc]
+          :continue ->
+            v = deep_map(v, function, options, level + 1)
+            [{k, v} | acc]
+          :skip ->
+            [{k, v} | acc]
+          :reject ->
+            acc
+        end
 
-      {k, v} ->
-        maybe_execute(function, {k, v}, options)
+      {k, v}, acc ->
+        case process_type({k, v}, options) do
+          :process ->
+            [function.({k, v}) | acc]
+          :continue ->
+            [{k, v} | acc]
+          :skip ->
+            [{k, v} | acc]
+          :reject ->
+            acc
+        end
     end)
     |> Map.new()
   end
 
   defp deep_map(map, {key_function, value_function}, options, level) when is_map(map) do
-    Enum.map(map, fn
-      {k, v} when is_map(v) or is_list(v) ->
-        {maybe_execute(key_function, k, options),
-         deep_map(v, {key_function, value_function}, options, level + 1)}
+    Enum.reduce(map, [], fn
+      {k, v}, acc when is_map(v) or is_list(v) ->
+        case process_type({k, v}, options) do
+          :process ->
+            v = deep_map(v, {key_function, value_function}, options, level + 1)
+            [{key_function.({k, v}), v} | acc]
+          :continue ->
+            v = deep_map(v, {key_function, value_function}, options, level + 1)
+            [{k, v} | acc]
+          :skip ->
+            [{k, v} | acc]
+          :reject ->
+            acc
+        end
 
-      {k, v} ->
-        {maybe_execute(key_function, k, options), maybe_execute(value_function, v, options)}
+      {k, v}, acc ->
+        case process_type({k, v}, options) do
+          :process ->
+            [{key_function.({k, v}), value_function.({k, v})} | acc]
+          :skip ->
+            [{k, v} | acc]
+          :reject ->
+            acc
+        end
     end)
     |> Map.new()
   end
@@ -159,24 +220,35 @@ defmodule Cldr.Map do
   end
 
   defp deep_map([head | rest], function, options, level) do
-    [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
+    case process_type(head, options) do
+      :process ->
+        [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
+      :skip ->
+        [head | deep_map(rest, function, options, level + 1)]
+      :reject ->
+        deep_map(rest, function, options, level + 1)
+    end
   end
 
   defp deep_map(value, function, options, _level) when is_function(function) do
-    maybe_execute(function, value, options)
+    case process_type(value, options) do
+      :process ->
+        function.(value)
+      :skip ->
+        value
+      :reject ->
+        nil
+    end
   end
 
   defp deep_map(value, {_key_function, value_function}, options, _level) do
-    maybe_execute(value_function, value, options)
-  end
-
-  # Execute the function if the conditions expressed
-  # by options `:only` and `:except` are met
-  defp maybe_execute(function, value, options) do
-    if process_element?(value, options) do
-      function.(value)
-    else
-      value
+    case process_type(value, options) do
+      :process ->
+        value_function.(value)
+      :skip ->
+        value
+      :reject ->
+        nil
     end
   end
 
@@ -693,7 +765,8 @@ defmodule Cldr.Map do
   end
 
   defp validate_options(options) do
-    (@default_deep_map_options ++ options)
+    @default_deep_map_options
+    |> Keyword.merge(options)
     |> Map.new()
     |> Map.update!(:level, fn
       level when is_integer(level) ->
@@ -793,57 +866,135 @@ defmodule Cldr.Map do
   defp underscore_key({k, v}) when is_binary(k), do: {underscore(k), v}
   defp underscore_key(other), do: other
 
-  # If the term isn't a list, wrap it in a list
-  defp maybe_wrap(element) when is_list(element) do
-    element
-  end
-
-  defp maybe_wrap(element) do
-    [element]
-  end
-
   # process_element?/2 determines whether the
   # calling function should apply to a given
   # value
-  defp process_element?(x, options) do
-    only = Map.get(options, :only, []) |> maybe_wrap
-    except = Map.get(options, :except, []) |> maybe_wrap
-    process_element?(x, only, except)
+
+  def process_type(x, options) do
+    filter? = filter?(x, options)
+    reject? = reject?(x, options)
+
+    cond do
+      reject? -> :reject
+      skip?(x, options) -> :skip
+      filter? && only?(x, options) && !except?(x, options) -> :process
+      filter? -> :continue
+      true -> :reject
+    end
+    # |> IO.inspect(label: inspect(x))
   end
 
-  defp process_element?(_x, [], []) do
+  # Keep this branch but don't process it
+  defp skip?(x, %{skip: skip}) when is_function(skip) do
+    skip.(x)
+  end
+
+  defp skip?({k, _v}, %{skip: skip}) when is_list(skip) do
+    k in skip
+  end
+
+  defp skip?({k, _v}, %{skip: skip}) do
+    k == skip
+  end
+
+  defp skip?(k, %{skip: skip}) when is_list(skip) do
+    k in skip
+  end
+
+  defp skip?(k, %{skip: skip}) do
+    k == skip
+  end
+
+  # Keep this branch is the result
+  defp filter?(x, %{filter: filter}) when is_function(filter) do
+    filter.(x)
+  end
+
+  defp filter?(_x, %{filter: []}) do
     true
   end
 
-  defp process_element?(x, [], [except]) when is_function(except) do
-    !except.(x)
+  defp filter?({k, _v}, %{filter: filter}) when is_list(filter) do
+    k in filter
   end
 
-  defp process_element?({k, _v}, [], except) do
-    k not in except
+  defp filter?({k, _v}, %{filter: filter}) do
+    k == filter
   end
 
-  defp process_element?(x, [only], []) when is_function(only) do
+  defp filter?(k, %{filter: filter}) when is_list(filter) do
+    k in filter
+  end
+
+  defp filter?(k, %{filter: filter}) do
+    k == filter
+  end
+
+  # Don't include this branch is the result
+  defp reject?(x, %{reject: reject}) when is_function(reject) do
+    reject.(x)
+  end
+
+  defp reject?({k, _v}, %{reject: reject}) when is_list(reject) do
+    k in reject
+  end
+
+  defp reject?({k, _v}, %{reject: reject})  do
+    k == reject
+  end
+
+  defp reject?(k, %{reject: reject}) when is_list(reject) do
+    k in reject
+  end
+
+  defp reject?(k, %{reject: reject})  do
+    k == reject
+  end
+
+  # Process this item
+  defp only?(x, %{only: only}) when is_function(only) do
     only.(x)
   end
 
-  defp process_element?({k, _v}, only, []) do
+  defp only?(_x, %{only: []}) do
+    true
+  end
+
+  defp only?({k, _v}, %{only: only}) when is_list(only) do
     k in only
   end
 
-  defp process_element?(x, [only], [except]) when is_function(only) and is_function(except) do
-    only.(x) && not except.(x)
+  defp only?({k, _v}, %{only: only}) do
+    k == only
   end
 
-  defp process_element?({k, _v} = x, [only], except) when is_function(only) do
-    only.(x) && k not in except
+  defp only?(k, %{only: only}) when is_list(only) do
+    k in only
   end
 
-  defp process_element?({k, _v} = x, only, [except]) when is_function(except) do
-    k in only && !except.(x)
+  defp only?(k, %{only: only}) do
+    k == only
   end
 
-  defp process_element?(x, only, except) do
-    x in only and x not in except
+  # Don;t process this item
+  defp except?(x, %{except: except}) when is_function(except) do
+    except.(x)
   end
+
+  defp except?({k, _v}, %{except: except}) when is_list(except) do
+    k in except
+  end
+
+  defp except?({k, _v}, %{except: except}) do
+    k == except
+  end
+
+  defp except?(k, %{except: except}) when is_list(except) do
+    k in except
+  end
+
+  defp except?(k, %{except: except}) do
+    k == except
+  end
+
 end
