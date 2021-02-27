@@ -162,11 +162,11 @@ defmodule Cldr.Map do
           :process ->
             v = deep_map(v, function, options, level + 1)
             [function.({k, v}) | acc]
-          :continue ->
+          :except ->
             v = deep_map(v, function, options, level + 1)
             [{k, v} | acc]
           :skip ->
-            [{k, v} | acc]
+            [function.({k, v}) | acc]
           :reject ->
             acc
         end
@@ -175,10 +175,10 @@ defmodule Cldr.Map do
         case process_type({k, v}, options) do
           :process ->
             [function.({k, v}) | acc]
-          :continue ->
+          :except ->
             [{k, v} | acc]
           :skip ->
-            [{k, v} | acc]
+            [function.({k, v}) | acc]
           :reject ->
             acc
         end
@@ -192,12 +192,12 @@ defmodule Cldr.Map do
         case process_type({k, v}, options) do
           :process ->
             v = deep_map(v, {key_function, value_function}, options, level + 1)
-            [{key_function.({k, v}), v} | acc]
-          :continue ->
+            [{key_function.(k), value_function.(v)} | acc]
+          :except ->
             v = deep_map(v, {key_function, value_function}, options, level + 1)
             [{k, v} | acc]
           :skip ->
-            [{k, v} | acc]
+            [{key_function.(k), v} | acc]
           :reject ->
             acc
         end
@@ -205,11 +205,11 @@ defmodule Cldr.Map do
       {k, v}, acc ->
         case process_type({k, v}, options) do
           :process ->
-            [{key_function.({k, v}), value_function.({k, v})} | acc]
-          :continue ->
+            [{key_function.(k), value_function.(v)} | acc]
+          :except ->
             [{k, v} | acc]
           :skip ->
-            [{k, v} | acc]
+            [{key_function.(k), v} | acc]
           :reject ->
             acc
         end
@@ -225,7 +225,7 @@ defmodule Cldr.Map do
     case process_type(head, options) do
       :process ->
         [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
-      :continue ->
+      :except ->
         [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
       :skip ->
         [head | deep_map(rest, function, options, level + 1)]
@@ -238,7 +238,7 @@ defmodule Cldr.Map do
     case process_type(value, options) do
       :process ->
         function.(value)
-      :continue ->
+      :except ->
         value
       :skip ->
         value
@@ -884,8 +884,7 @@ defmodule Cldr.Map do
       reject? -> :reject
       skip?(x, options) -> :skip
       filter? && only?(x, options) && !except?(x, options) -> :process
-      filter? -> :continue
-      true -> :reject
+      filter? -> :except
     end
     # |> IO.inspect(label: inspect(x))
   end

@@ -73,4 +73,39 @@ defmodule Support.Map.Test do
 
     assert Cldr.Map.atomize_keys(test_map, level: 1..1) == test_result
   end
+
+  test "deep_map with :skip" do
+    test_map = %{
+      "key" => %{
+        "nested" => %{
+          "some" => "value"
+        }
+      }
+    }
+
+    test_result = %{
+      key: %{
+        :nested => %{
+          "some" => "value"
+        }
+      }
+    }
+
+    assert Cldr.Map.atomize_keys(test_map, skip: "nested") == test_result
+  end
+
+  test "deep_map with :reject" do
+    test_map = %{
+      "key" => %{
+        "nested" => "value"
+      }
+    }
+
+    test_result = %{
+      key: %{}
+    }
+
+    assert Cldr.Map.atomize_keys(test_map, reject: "nested") == test_result
+  end
+
 end
