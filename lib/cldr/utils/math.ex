@@ -765,7 +765,7 @@ defmodule Cldr.Math do
   end
 
   # Originally adapted from https://github.com/ewildgoose/elixir-float_pp
-  # Thanks for making htis like @ewildgoose
+  # Thanks for making this like @ewildgoose
 
   @doc """
   Round a number to an arbitrary precision using one of several rounding algorithms.

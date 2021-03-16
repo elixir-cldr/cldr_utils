@@ -411,8 +411,12 @@ defmodule Cldr.Digits do
     0.0
   end
 
-  def to_float({digits, place, sign}) do
+  def to_float({digits, place, sign}) when length(digits) >= place do
     Integer.undigits(digits) / power_of_10(length(digits) - place) * sign
+  end
+
+  def to_float({digits, place, sign}) do
+    Integer.undigits(digits) * power_of_10(place - length(digits)) * sign * 1.0
   end
 
   def to_decimal({digits, place, sign}) do
