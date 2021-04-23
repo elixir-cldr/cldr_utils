@@ -65,7 +65,7 @@ defmodule Cldr.Map do
   * `:reject` is a term or list of terms or a `check function`. If the
     `key` currently being processed equals the term (or is in the list of
     terms, or the `check_function` returns a truthy value) then this branch
-    of the map is ommited from the mapped output.
+    of the map is omitted from the mapped output.
 
   * `:skip` is a term or list of terms or a `check function`. If the
     `key` currently being processed equals the term (or is in the list of
@@ -560,7 +560,7 @@ defmodule Cldr.Map do
   end
 
   @doc """
-  Convert a camelCase string or atome to a snake_case
+  Convert a camelCase string or atom to a snake_case
 
   * `string` is a `String.t` or `atom()` to be
     transformed
