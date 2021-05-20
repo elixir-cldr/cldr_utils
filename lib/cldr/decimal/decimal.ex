@@ -2,7 +2,7 @@ defmodule Cldr.Decimal do
   @moduledoc """
   Adds a compatibility layer for functions which changed
   either semantics or returns types between Decimal version
-  1.x and 2.x
+  1.x and 2.x.
 
   """
   decimal_version = Application.ensure_all_started(:decimal) &&

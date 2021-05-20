@@ -9,7 +9,6 @@ defmodule Cldr.String do
 
   See https://cp-algorithms.com/string/string-hashing.html for
   a description of the algoithim.
-
   """
 
   @p 99991
@@ -28,9 +27,9 @@ defmodule Cldr.String do
   end
 
   @doc """
-  Replaces "-" with "_" in a string
+  Replaces "-" with "_" in a string.
 
-  ### Example
+  ## Examples
 
       iex> Cldr.String.to_underscore("this-one")
       "this_one"
@@ -45,15 +44,15 @@ defmodule Cldr.String do
 
   The change is to cater for strings in the format:
 
-    This_That
+      This_That
 
-  which in Macro.underscore gets formatted as
+  which in Macro.underscore gets formatted as:
 
-    this__that (note the double underscore)
+      this__that (note the double underscore)
 
-  when we actually want
+  when we actually want:
 
-    that_that
+      that_that
 
   """
   def underscore(atom) when is_atom(atom) do

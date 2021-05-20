@@ -1,9 +1,9 @@
 defmodule Cldr.Enum do
   @doc """
   Very simple reduce that passes both the head and the tail
-  to the reducing function so it has some lookahead
-
+  to the reducing function so it has some lookahead.
   """
+
   def reduce_peeking(_list, {:halt, acc}, _fun),
     do: {:halted, acc}
 
