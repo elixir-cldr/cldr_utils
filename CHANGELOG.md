@@ -12,6 +12,10 @@ This is the changelog for Cldr Utils v2.16.0 released on June 11th, 2021.  For o
 
 * Make resolver a parameter to `Cldr.Map.merge_map_list/2`
 
+* Add `Cldr.Map.prune/2` that prunes (deletes) branches from a (possibly deeply nested) map
+
+* Add `Cldr.Map.invert/1` that inverts the `{key, value}` of a map to be `{value, key}` and if `value` is a list, one new map entry for each element of `value` will be created (mapped to `key`)
+
 ## Cldr Utils version 2.15.1
 
 This is the changelog for Cldr Utils v2.15.1 released on March 16th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
