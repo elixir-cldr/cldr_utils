@@ -8,6 +8,10 @@ This is the changelog for Cldr Utils v2.16.0 released on June 11th, 2021.  For o
 
 * Add `Cldr.Map.extract_strings/2`
 
+* Make resolver a parameter to `Cldr.Map.deep_merge/3`
+
+* Make resolver a parameter to `Cldr.Map.merge_map_list/2`
+
 ## Cldr Utils version 2.15.1
 
 This is the changelog for Cldr Utils v2.15.1 released on March 16th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

@@ -665,15 +665,17 @@ defmodule Cldr.Map do
       %{a: "a", b: "b", c: "c", d: "d"}
 
   """
-  def merge_map_list([h | []]) do
+  def merge_map_list(list, resolver \\ &standard_deep_resolver/3)
+
+  def merge_map_list([h | []], _resolver) do
     h
   end
 
-  def merge_map_list([h | t]) do
-    deep_merge(h, merge_map_list(t))
+  def merge_map_list([h | t], resolver) do
+    deep_merge(h, merge_map_list(t, resolver), resolver)
   end
 
-  def merge_map_list([]) do
+  def merge_map_list([], _resolver) do
     []
   end
 
@@ -693,20 +695,20 @@ defmodule Cldr.Map do
       %{a: "aa", b: "b", c: "c", d: "d"}
 
   """
-  def deep_merge(left, right) when is_map(left) and is_map(right) do
-    Map.merge(left, right, &deep_resolve/3)
+  def deep_merge(left, right, resolver \\ &standard_deep_resolver/3) when is_map(left) and is_map(right) do
+    Map.merge(left, right, resolver)
   end
 
   # Key exists in both maps, and both values are maps as well.
   # These can be merged recursively.
-  defp deep_resolve(_key, left, right) when is_map(left) and is_map(right) do
-    deep_merge(left, right)
+  defp standard_deep_resolver(_key, left, right) when is_map(left) and is_map(right) do
+    deep_merge(left, right, &standard_deep_resolver/3)
   end
 
   # Key exists in both maps, but at least one of the values is
   # NOT a map. We fall back to standard merge behavior, preferring
   # the value on the right.
-  defp deep_resolve(_key, _left, right) do
+  defp standard_deep_resolver(_key, _left, right) do
     right
   end
 
