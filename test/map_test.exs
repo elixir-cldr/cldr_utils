@@ -108,4 +108,15 @@ defmodule Support.Map.Test do
     assert Cldr.Map.atomize_keys(test_map, reject: "nested") == test_result
   end
 
+  test "Cldr.Map.extract_strings/2" do
+    assert Cldr.Map.extract_strings(%{a: "string", b: :atom, c: "Another string"}) ==
+      ["Another string", "string"]
+
+    assert Cldr.Map.extract_strings(%{a: "string", b: %{c: "Another string"}}) ==
+      ["Another string", "string"]
+
+    assert Cldr.Map.extract_strings(%{a: "string", b: [:c, "Another string"]}) ==
+      ["Another string", "string"]
+  end
+
 end

@@ -751,6 +751,40 @@ defmodule Cldr.Map do
     Map.new(keyword_list)
   end
 
+  @doc """
+  Extract strings from a map or list
+
+  Recursively process the map or list
+  and extract string values from maps
+  and string elements from lists
+
+  """
+  def extract_strings(map_or_list, options \\ [])
+
+  def extract_strings([], _options) do
+    []
+  end
+
+  def extract_strings(map, _options) when is_map(map) do
+    Enum.reduce(map, [], fn
+      {_k, v}, acc when is_binary(v) -> [v | acc]
+      {_k, v}, acc when is_map(v) -> [extract_strings(v) | acc]
+      {_k, v}, acc when is_list(v) -> [extract_strings(v) | acc]
+      _other, acc -> acc
+    end)
+    |> List.flatten
+  end
+
+  def extract_strings(list, _options) when is_list(list) do
+    Enum.reduce(list, [], fn
+      v, acc when is_binary(v) -> [v | acc]
+      v, acc when is_map(v) -> extract_strings(v, acc)
+      v, acc when is_list(v) -> extract_strings(v, acc)
+      _other, acc -> acc
+    end)
+    |> List.flatten
+  end
+
   #
   # Helpers
   #
