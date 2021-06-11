@@ -1,7 +1,12 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
+<<<<<<< HEAD
   @version "2.16.0"
+=======
+  @source_url "https://github.com/elixir-cldr/cldr_utils"
+  @version "2.15.1"
+>>>>>>> 7dc78cd22ccb0caa4c916c2bcba054b1488b95a1
 
   def project do
     [
@@ -12,7 +17,7 @@ defmodule Cldr.Utils.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      source_url: "https://github.com/elixir-cldr/cldr_utils",
+      docs: docs(),
       test_coverage: [tool: ExCoveralls],
       aliases: aliases(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -26,7 +31,7 @@ defmodule Cldr.Utils.MixProject do
 
   defp description do
     """
-    Map, Calendar, Digits, Decimal, HTTP, Macro, Math and String helpers for ex_cldr
+    Map, Calendar, Digits, Decimal, HTTP, Macro, Math, and String helpers for ex_cldr.
     """
   end
 
@@ -41,7 +46,7 @@ defmodule Cldr.Utils.MixProject do
       {:decimal, "~> 1.9 or ~> 2.0"},
       {:castore, "~> 0.1", optional: true},
       {:certifi, "~> 2.5", optional: true},
-      {:ex_doc, "~> 0.18", optional: true, only: [:dev, :release], runtime: false},
+      {:ex_doc, ">= 0.0.0", optional: true, only: [:dev, :release], runtime: false},
       {:stream_data, "~> 0.5", optional: true, only: :test},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev], runtime: false},
       {:benchee, "~> 1.0", optional: true, only: [:dev], runtime: false}
@@ -51,7 +56,7 @@ defmodule Cldr.Utils.MixProject do
   defp package do
     [
       maintainers: ["Kip Cole"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: links(),
       files: [
         "lib",
@@ -66,21 +71,25 @@ defmodule Cldr.Utils.MixProject do
 
   def links do
     %{
-      "GitHub" => "https://github.com/elixir-cldr/cldr_utils",
-      "Readme" => "https://github.com/elixir-cldr/cldr_utils/blob/v#{@version}/README.md",
-      "Changelog" => "https://github.com/elixir-cldr/cldr_utils/blob/v#{@version}/CHANGELOG.md"
+      "GitHub" => @source_url,
+      "Readme" => "#{@source_url}/blob/v#{@version}/README.md",
+      "Changelog" => "#{@source_url}/blob/v#{@version}/CHANGELOG.md"
     }
   end
 
   def docs do
     [
-      source_ref: "v#{@version}",
-      main: "readme",
       extras: [
-        "README.md",
+        "CHANGELOG.md",
         "LICENSE.md",
-        "CHANGELOG.md"
-      ]
+        "README.md"
+      ],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatters: ["html"],
+      logo: "logo.png",
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
   end
 

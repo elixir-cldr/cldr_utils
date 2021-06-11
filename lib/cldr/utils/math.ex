@@ -1,7 +1,8 @@
 defmodule Cldr.Math do
   @moduledoc """
-  Math helper functions for number formatting
+  Math helper functions for number formatting.
   """
+
   alias Cldr.Digits
   require Integer
 
@@ -30,7 +31,7 @@ defmodule Cldr.Math do
   end
 
   @doc """
-  Returns the default number of rounding digits
+  Returns the default number of rounding digits.
   """
   @spec default_rounding :: integer
   def default_rounding do
@@ -38,7 +39,7 @@ defmodule Cldr.Math do
   end
 
   @doc """
-  Returns the default rounding mode for rounding operations
+  Returns the default rounding mode for rounding operations.
   """
   @spec default_rounding_mode :: atom
   def default_rounding_mode do
@@ -151,7 +152,7 @@ defmodule Cldr.Math do
   end
 
   @doc """
-  Returns the adjusted modulus of `x` and `y`
+  Returns the adjusted modulus of `x` and `y`.
   """
   @spec amod(number_or_decimal, number_or_decimal) :: number_or_decimal
   @decimal_zero Decimal.new(0)
@@ -176,12 +177,11 @@ defmodule Cldr.Math do
   end
 
   @doc """
-  Returns the adusted remainder and dividend of two
+  Returns the adjusted remainder and dividend of two
   integers.
 
   This version will return the divisor if the remainder
   would otherwise be zero.
-
   """
   @spec div_amod(integer, integer) :: {integer, integer}
   def div_amod(int1, int2) do
@@ -202,7 +202,6 @@ defmodule Cldr.Math do
   This is very likely to lose precision - lots of numbers won't
   make the round trip conversion.  Use with care.  Actually, better
   not to use it at all.
-
   """
   @spec to_float(%Decimal{}) :: float
   def to_float(%Decimal{sign: sign, coef: coef, exp: exp}) do
@@ -284,7 +283,6 @@ defmodule Cldr.Math do
     counted)
 
   Many thanks to [Stackoverflow](http://stackoverflow.com/questions/202302/rounding-to-an-arbitrary-number-of-significant-digits)
-
   """
   @spec round_significant(number_or_decimal, integer) :: number_or_decimal
   def round_significant(number, n) when is_number(number) and n <= 0 do

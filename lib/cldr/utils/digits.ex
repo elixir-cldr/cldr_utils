@@ -24,10 +24,10 @@ defmodule Cldr.Digits do
 
   * a `1` or `-1` representing the sign of the number
 
-  A number in integer, float or Decimal forma can be converted
-  to digit form with `Digits.to_digits/1`
+  A number in integer, float or Decimal form can be converted
+  to digit form with `Digits.to_digits/1`.
 
-  THe digits can be converted back to normal form with
+  The digits can be converted back to normal form with
   `Cldr.Digits.to_integer/1`, `Cldr.Digits.to_float/1` and
   `Cldr.Digits.to_decimal/1`.
   """
@@ -299,17 +299,19 @@ defmodule Cldr.Digits do
   @doc """
   Converts given number to a list representation.
 
-  Given an IEEE 754 float, computes the shortest, correctly rounded list of digits
-  that converts back to the same Double value when read back with String.to_float/1.
-  Implements the algorithm from "Printing Floating-Point Numbers Quickly and Accurately"
-  in Proceedings of the SIGPLAN '96 Conference on Programming Language Design and Implementation.
+  Given an IEEE 754 float, computes the shortest, correctly rounded list of
+  digits that converts back to the same Double value when read back with
+  String.to_float/1.  Implements the algorithm from "Printing Floating-Point
+  Numbers Quickly and Accurately" in Proceedings of the SIGPLAN '96 Conference
+  on Programming Language Design and Implementation.
 
   Returns a tuple comprising a charlist for the integer part,
-  a charlist for the fractional part and an integer for the sign
+  a charlist for the fractional part and an integer for the sign.
   """
 
-  #   Code extracted from: https://github.com/ewildgoose/elixir-float_pp/blob/master/lib/float_pp/digits.ex
-  #   Which is licenced under http://www.apache.org/licenses/LICENSE-2.0
+  # Code extracted from:
+  # https://github.com/ewildgoose/elixir-float_pp/blob/master/lib/float_pp/digits.ex,
+  # which is licensed under http://www.apache.org/licenses/LICENSE-2.0
 
   @spec to_tuple(Decimal.t() | number) :: {list(), list(), integer}
   def to_tuple(number) do
@@ -347,9 +349,10 @@ defmodule Cldr.Digits do
 
   @doc """
   Computes a iodata list of the digits of the given IEEE 754 floating point number,
-  together with the location of the decimal point as {digits, place, positive}
+  together with the location of the decimal point as {digits, place, positive}.
+
   A "compact" representation is returned, so there may be fewer digits returned
-  than the decimal point location
+  than the decimal point location.
   """
   def to_digits(0.0), do: {[0], 1, 1}
   def to_digits(0), do: {[0], 1, 1}
@@ -392,7 +395,7 @@ defmodule Cldr.Digits do
 
   @doc """
   Takes a list of digits and coverts them back to a number of the same
-  type as `number`
+  type as `number`.
   """
   def to_number(digits, number) when is_integer(number), do: to_integer(digits)
   def to_number(digits, number) when is_float(number), do: to_float(digits)
