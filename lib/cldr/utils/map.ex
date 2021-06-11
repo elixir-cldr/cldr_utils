@@ -712,6 +712,10 @@ defmodule Cldr.Map do
     right
   end
 
+  def combine_list_resolver(_key, left, right) when is_list(left) and is_list(right) do
+    left ++ right
+  end
+
   @doc """
   Delete all members of a map that have a
   key in the list of keys
@@ -787,6 +791,31 @@ defmodule Cldr.Map do
     |> List.flatten
   end
 
+  @doc """
+  Prune a potentially deeply nested map of some of
+  its branches
+
+  """
+  def prune(map, fun) when is_map(map) and is_function(fun, 1) do
+    deep_map(map, &(&1), reject: fun)
+  end
+
+  @doc """
+  Invert a map
+
+  Requires that the map is a simple map of
+  keys and a list of values or a single
+  non-map value
+
+  """
+  def invert(map) when is_map(map) do
+    map
+    |> Enum.flat_map(fn
+      {k, v} when is_list(v) -> Enum.map(v, fn vv -> {vv, k} end)
+      {k, v} when not is_map(v) -> {v, k}
+    end)
+    |> Map.new()
+  end
   #
   # Helpers
   #
