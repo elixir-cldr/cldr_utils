@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr Utils version 2.16.1
+
+This is the changelog for Cldr Utils v2.16.1 released on _______, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Don't attempt to convert calendar era dates to iso days - do that when required in `ex_cldr_calendars`
+
 ## Cldr Utils version 2.16.0
 
 This is the changelog for Cldr Utils v2.16.0 released on June 11th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
