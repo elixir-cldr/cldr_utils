@@ -807,15 +807,69 @@ defmodule Cldr.Map do
   keys and a list of values or a single
   non-map value
 
+  ## Options
+
+  * `:duplicates`. Can be `:keep` to
+    keep duplicate values, `:shortest` which
+    will keep the shortest match or
+    `:longest` which will keep the longest
+    match. The default is `false` which means
+    means only one value is kept (which one
+    is non-deterministic)
+
   """
-  def invert(map) when is_map(map) do
+  def invert(map, options \\ [])
+
+  def invert(map, options) when is_map(map) do
     map
     |> Enum.flat_map(fn
       {k, v} when is_list(v) -> Enum.map(v, fn vv -> {vv, k} end)
       {k, v} when not is_map(v) -> {v, k}
     end)
+    |> process_duplicates(options[:duplicates])
+  end
+
+  defp process_duplicates(list, keep) when is_nil(keep) or keep == false do
+    Map.new(list)
+  end
+
+  defp process_duplicates(list, :keep) do
+    list
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+  end
+
+  defp process_duplicates(list, :shortest) do
+    list
+    |> process_duplicates(:keep)
+    |> Enum.map(fn {k, v} -> {k, shortest(v)} end)
     |> Map.new()
   end
+
+  defp process_duplicates(list, :longest) do
+    list
+    |> process_duplicates(:keep)
+    |> Enum.map(fn {k, v} -> {k, longest(v)} end)
+    |> Map.new()
+  end
+
+  defp shortest(list) when is_list(list) do
+    Enum.min_by(list, &len/1)
+  end
+
+  defp longest(list) when is_list(list) do
+    Enum.max_by(list, &len/1)
+  end
+
+  defp len(e) when is_binary(e) do
+    String.length(e)
+  end
+
+  defp len(e) when is_atom(e) do
+    e
+    |> Atom.to_string
+    |> len()
+  end
+
   #
   # Helpers
   #
