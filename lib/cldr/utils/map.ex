@@ -809,13 +809,16 @@ defmodule Cldr.Map do
 
   ## Options
 
-  * `:duplicates`. Can be `:keep` to
-    keep duplicate values, `:shortest` which
-    will keep the shortest match or
-    `:longest` which will keep the longest
-    match. The default is `false` which means
-    means only one value is kept (which one
-    is non-deterministic)
+  * `:duplicates` which determines how duplicate values
+    are handled:
+    * `nil` or `false` which is the default and means only
+      one value is kept. `Map.new/1` is used meanng the
+      selected value is non-deterministic.
+    * `:keep` meaning duplicate values are returned in a list
+    * `:shortest` means the shortest duplicate is kept.
+      This operates on string or atom values.
+    * `:longest` means the shortest duplicate is kept.
+      This operates on string or atom values.
 
   """
   def invert(map, options \\ [])
