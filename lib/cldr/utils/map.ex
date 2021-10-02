@@ -159,8 +159,11 @@ defmodule Cldr.Map do
     Enum.reduce(map, [], fn
       {k, v}, acc when is_map(v) or is_list(v) ->
         case process_type({k, v}, options) do
+          :continue ->
+            v = deep_map(v, function, Map.put(options, :filtering, true), level + 1)
+            [{k, v} | acc]
           :process ->
-            v = deep_map(v, function, options, level + 1)
+            v = deep_map(v, function, Map.put(options, :filtering, true), level + 1)
             [function.({k, v}) | acc]
           :except ->
             v = deep_map(v, function, options, level + 1)
@@ -173,6 +176,8 @@ defmodule Cldr.Map do
 
       {k, v}, acc ->
         case process_type({k, v}, options) do
+          :continue ->
+            [{k, v} | acc]
           :process ->
             [function.({k, v}) | acc]
           :except ->
@@ -190,8 +195,11 @@ defmodule Cldr.Map do
     Enum.reduce(map, [], fn
       {k, v}, acc when is_map(v) or is_list(v) ->
         case process_type({k, v}, options) do
+          :continue ->
+            v = deep_map(v, {key_function, value_function}, Map.put(options, :filtering, true), level + 1)
+            [{k, v} | acc]
           :process ->
-            v = deep_map(v, {key_function, value_function}, options, level + 1)
+            v = deep_map(v, {key_function, value_function}, Map.put(options, :filtering, true), level + 1)
             [{key_function.(k), value_function.(v)} | acc]
           :except ->
             v = deep_map(v, {key_function, value_function}, options, level + 1)
@@ -204,6 +212,8 @@ defmodule Cldr.Map do
 
       {k, v}, acc ->
         case process_type({k, v}, options) do
+          :contine ->
+            [{k, v} | acc]
           :process ->
             [{key_function.(k), value_function.(v)} | acc]
           :except ->
@@ -223,10 +233,14 @@ defmodule Cldr.Map do
 
   defp deep_map([head | rest], function, options, level) do
     case process_type(head, options) do
+      :continue ->
+        [head | deep_map(rest, function, Map.put(options, :filtering, true), level + 1)]
       :process ->
-        [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
+        [deep_map(head, function, Map.put(options, :filtering, true), level + 1) |
+          deep_map(rest, function, options, level + 1)]
       :except ->
-        [deep_map(head, function, options, level + 1) | deep_map(rest, function, options, level + 1)]
+        [deep_map(head, function, options, level + 1) |
+          deep_map(rest, function, options, level + 1)]
       :skip ->
         [head | deep_map(rest, function, options, level + 1)]
       :reject ->
@@ -236,6 +250,8 @@ defmodule Cldr.Map do
 
   defp deep_map(value, function, options, _level) when is_function(function) do
     case process_type(value, options) do
+      :continue ->
+        value
       :process ->
         function.(value)
       :except ->
@@ -249,6 +265,8 @@ defmodule Cldr.Map do
 
   defp deep_map(value, {_key_function, value_function}, options, _level) do
     case process_type(value, options) do
+      :continue ->
+        value
       :process ->
         value_function.(value)
       :skip ->
@@ -284,12 +302,15 @@ defmodule Cldr.Map do
 
   def atomize_keys(map, options) when is_map(map) or is_list(map) do
     options = @default_atomize_options ++ options
-    deep_map(map, &atomize_key(&1, Map.new(options)), options)
+    map_options = Map.new(options)
+
+    deep_map(map, &atomize_key(&1, map_options), options)
   end
 
   def atomize_keys({k, value}, options) when is_map(value) or is_list(value) do
     options = @default_atomize_options ++ options
     map_options = Map.new(options)
+
     {atomize_key(k, map_options), deep_map(value, &atomize_key(&1, map_options), options)}
   end
 
@@ -327,12 +348,15 @@ defmodule Cldr.Map do
 
   def atomize_values(map, options) when is_map(map) or is_list(map) do
     options = @default_atomize_options ++ options
-    deep_map(map, &atomize_value(&1, Map.new(options)), options)
+    map_options = Map.new(options)
+
+    deep_map(map, &atomize_value(&1, map_options), options)
   end
 
   def atomize_values({k, value}, options) when is_map(value) or is_list(value) do
     options = @default_atomize_options ++ options
     map_options = Map.new(options)
+
     {k, deep_map(value, &atomize_value(&1, map_options), options)}
   end
 
@@ -999,14 +1023,18 @@ defmodule Cldr.Map do
   # value
 
   def process_type(x, options) do
-    filter? = filter?(x, options)
-    reject? = reject?(x, options)
+    filter? = filter?(x, options) # |> IO.inspect(label: "Filter: #{inspect x}")
+    reject? = reject?(x, options) # |> IO.inspect(label: "Reject: #{inspect x}")
+    # IO.inspect only?(x, options), label: "Only: #{inspect x}"
+    # IO.inspect except?(x, options), label: "Except: #{inspect x}"
+    # IO.inspect skip?(x, options), label: "Skip: #{inspect x}"
 
     cond do
       reject? -> :reject
       skip?(x, options) -> :skip
       filter? && only?(x, options) && !except?(x, options) -> :process
-      filter? -> :except
+      filter? -> :continue
+      true -> :except
     end
     # |> IO.inspect(label: inspect(x))
   end
@@ -1035,6 +1063,10 @@ defmodule Cldr.Map do
   # Keep this branch is the result
   defp filter?(x, %{filter: filter}) when is_function(filter) do
     filter.(x)
+  end
+
+  defp filter?(_x, %{filtering: true}) do
+    true
   end
 
   defp filter?(_x, %{filter: []}) do
