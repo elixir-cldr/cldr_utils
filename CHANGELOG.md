@@ -1,12 +1,20 @@
 # Changelog
 
+## Cldr Utils version 2.17.0
+
+This is the changelog for Cldr Utils v2.17.0 released on October 27th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Don't attempt to convert calendar era dates to iso days - do that when required in `ex_cldr_calendars`
+
+* Remove `Cldr.Calendar.Conversion` module which is not required
+
+* Fix `Cldr.Map.deep_map/3` so that the `:filter` option is propogated correctly when `:only/:except` is also specified.
+
 ## Cldr Utils version 2.17.0-rc.0
 
-<<<<<<< HEAD
-This is the changelog for Cldr Utils v2.17.0 released on October 27th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
-=======
-This is the changelog for Cldr Utils v2.17.0 released on October 3rd, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
->>>>>>> c0f78684ba023d510281081a0f6d3f28dbe1de99
+This is the changelog for Cldr Utils v2.17.0 released on October 5th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
