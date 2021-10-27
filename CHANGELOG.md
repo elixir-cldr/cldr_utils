@@ -4,6 +4,15 @@
 
 This is the changelog for Cldr Utils v2.17.0 released on October 27th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
+### Enhancements
+
+* Add `:duplicates` option to `Cldr.Map.invert/2` to determine how to handle duplicate values after inversion. The options are:
+
+  * `nil` or `false` which is the default and means only one value is kept. `Map.new/1` is used meanng the selected value is non-deterministic.
+  * `:keep` meaning duplicate values are returned in a list
+  * `:shortest` means the shortest duplicate is kept. This operates on string or atom values.
+  * `:longest` means the shortest duplicate is kept. This operates on string or atom values.
+
 ### Bug Fixes
 
 * Don't attempt to convert calendar era dates to iso days - do that when required in `ex_cldr_calendars`
