@@ -212,7 +212,7 @@ defmodule Cldr.Map do
 
       {k, v}, acc ->
         case process_type({k, v}, options) do
-          :contine ->
+          :continue ->
             [{k, v} | acc]
           :process ->
             [{key_function.(k), value_function.(v)} | acc]
