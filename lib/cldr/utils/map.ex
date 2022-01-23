@@ -849,10 +849,11 @@ defmodule Cldr.Map do
 
   def invert(map, options) when is_map(map) do
     map
-    |> Enum.flat_map(fn
+    |> Enum.map(fn
       {k, v} when is_list(v) -> Enum.map(v, fn vv -> {vv, k} end)
       {k, v} when not is_map(v) -> {v, k}
     end)
+    |> List.flatten
     |> process_duplicates(options[:duplicates])
   end
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr Utils version 2.17.1
+
+This is the changelog for Cldr Utils v2.17.1 released on _______.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix `Cldr.Map.invert/2` to use `Enum.map/2` not `Enum.flat_map/2`
+
 ## Cldr Utils version 2.17.0
 
 This is the changelog for Cldr Utils v2.17.0 released on October 27th, 2021.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
