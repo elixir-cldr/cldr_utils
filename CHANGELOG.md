@@ -1,5 +1,13 @@
 # Changelog
 
+## Cldr Utils version 2.17.2
+
+This is the changelog for Cldr Utils v2.17.2 released on May 8th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Harden the SSL options for `Cldr.Http.get/1` in line with the recommendations at https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl
+
 ## Cldr Utils version 2.17.1
 
 This is the changelog for Cldr Utils v2.17.1 released on February 21st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
