@@ -9,7 +9,7 @@ defmodule Cldr.Digits do
   the number as happens during the formatting of a number for string output.
   """
 
-  use Bitwise
+  import Bitwise
   import Cldr.Math, only: [power_of_10: 1]
   require Integer
   alias Cldr.Math

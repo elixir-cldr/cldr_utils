@@ -1,14 +1,14 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.17.2"
+  @version "2.18.0"
   @source_url "https://github.com/elixir-cldr/cldr_utils"
 
   def project do
     [
       app: :cldr_utils,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.11",
       description: description(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),

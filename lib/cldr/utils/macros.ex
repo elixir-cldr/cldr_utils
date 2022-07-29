@@ -23,7 +23,7 @@ defmodule Cldr.Macros do
     end
   end
 
-  defmacro warn_once(key, message, level \\ :warn) do
+  defmacro warn_once(key, message, level \\ :warning) do
     caller = __CALLER__.module
 
     quote do
