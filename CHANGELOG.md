@@ -2,7 +2,7 @@
 
 ## Cldr Utils version 2.18.0
 
-This is the changelog for Cldr Utils v2.18.0 released on July 29th, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.18.0 released on July 31st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 **Cldr Utils now requires Elixir 1.11 or later**
 
