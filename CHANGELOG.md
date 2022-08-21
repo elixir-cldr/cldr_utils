@@ -1,5 +1,17 @@
 # Changelog
 
+## Cldr Utils version 2.19.0
+
+This is the changelog for Cldr Utils v2.19.0 released on August 22nd, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Enhancements
+
+* Sets SNI option for SSL connections
+
+* Supports `CLDR_UNSAFE_HTTPS` environment variable option which, if set to anything other than `FALSE`, `false`, `nil` or `NIL` will not perform peer verification for HTTPS requests. This may be used in circumstances where peer verification is failing but if generally not recommended.
+
 ## Cldr Utils version 2.18.0
 
 This is the changelog for Cldr Utils v2.18.0 released on July 31st, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

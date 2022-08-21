@@ -4,6 +4,8 @@ defmodule Cldr.Http do
 
   """
 
+  @cldr_unsafe_https "CLDR_UNSAFE_HTTPS"
+
   @doc """
   Securely download https content from
   a URL.
@@ -25,6 +27,16 @@ defmodule Cldr.Http do
   * `{:error, error}` if the download is
      unsuccessful. An error will also be logged
      in these cases.
+
+  ### Unsafe HTTPS
+
+  If the environment variable `CLDR_UNSAFE_HTTPS` is
+  set to anything other than `FALSE`, `false`, `nil`
+  or `NIL` then no peer verification of certificates
+  is performed. Setting this variable is not recommended
+  but may be required is where peer verification for
+  unidentified reasons. Please [open an issue](https://github.com/elixir-cldr/cldr/issues)
+  if this occurs.
 
   ### Certificate stores
 
@@ -75,9 +87,10 @@ defmodule Cldr.Http do
   def get(url) when is_binary(url) do
     require Logger
 
+    hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
 
-    case :httpc.request(:get, {url, headers()}, https_opts(), []) do
+    case :httpc.request(:get, {url, headers()}, https_opts(hostname), []) do
       {:ok, {{_version, 200, 'OK'}, _headers, body}} ->
         {:ok, body}
 
@@ -186,20 +199,37 @@ defmodule Cldr.Http do
     file
   end
 
-  defp https_opts do
-    [ssl:
-      [
-        verify: :verify_peer,
-        cacertfile: certificate_store(),
-        depth: 3,
-        ciphers: preferred_ciphers(),
-        versions: protocol_versions(),
-        eccs: preferred_eccs(),
-        customize_hostname_check: [
-          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+  defp https_opts(hostname) do
+    if secure_ssl?() do
+      [ssl:
+        [
+          verify: :verify_peer,
+          cacertfile: certificate_store(),
+          depth: 4,
+          ciphers: preferred_ciphers(),
+          versions: protocol_versions(),
+          eccs: preferred_eccs(),
+          reuse_sessions: true,
+          server_name_indication: hostname,
+          secure_renegotiate: true,
+          customize_hostname_check: [
+            match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+          ]
         ]
       ]
-    ]
+    else
+      [ssl:
+        [
+          verify: :verify_none,
+          server_name_indication: hostname,
+          secure_renegotiate: true,
+          reuse_sessions: true,
+          versions: protocol_versions(),
+          ciphers: preferred_ciphers(),
+          versions: protocol_versions(),
+        ]
+      ]
+    end
   end
 
   def preferred_ciphers do
@@ -234,6 +264,17 @@ defmodule Cldr.Http do
     # TLS curves: X25519, prime256v1, secp384r1
     preferred_eccs = [:secp256r1, :secp384r1]
     :ssl.eccs() -- (:ssl.eccs() -- preferred_eccs)
+  end
+
+  def secure_ssl? do
+    case System.get_env(@cldr_unsafe_https) do
+      nil -> true
+      "FALSE" -> false
+      "false" -> false
+      "nil" -> false
+      "NIL" -> false
+      _other -> true
+    end
   end
 
 end
