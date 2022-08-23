@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.19.1
+
+This is the changelog for Cldr Utils v2.19.1 released on August 23rd, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Bug Fixes
+
+* Use only TLS 1.2 on OTP versions less than 25.
+
 ## Cldr Utils version 2.19.0
 
 This is the changelog for Cldr Utils v2.19.0 released on August 22nd, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

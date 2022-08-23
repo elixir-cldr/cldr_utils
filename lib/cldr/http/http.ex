@@ -256,8 +256,11 @@ defmodule Cldr.Http do
   end
 
   def protocol_versions do
-    # Protocols: TLS 1.2, TLS 1.3
-    [:"tlsv1.2", :"tlsv1.3"]
+    if otp_version() < 25 do
+      [:"tlsv1.2"]
+    else
+      [:"tlsv1.2", :"tlsv1.3"]
+    end
   end
 
   def preferred_eccs do
@@ -277,4 +280,7 @@ defmodule Cldr.Http do
     end
   end
 
+  def otp_version do
+    :erlang.system_info(:otp_release) |> List.to_integer
+  end
 end
