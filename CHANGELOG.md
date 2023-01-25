@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.19.2
+
+This is the changelog for Cldr Utils v2.19.2 released on January 25th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Bug Fixes
+
+* Relaxes the requirement for the optional `ca_store` library. Thanks to @maennchen for the PR. Closes #6.
+
 ## Cldr Utils version 2.19.1
 
 This is the changelog for Cldr Utils v2.19.1 released on August 23rd, 2022.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
