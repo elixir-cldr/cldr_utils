@@ -8,7 +8,7 @@ This is the changelog for Cldr Utils v2.19.2 released on January 25th, 2023.  Fo
 
 ### Bug Fixes
 
-* Relaxes the requirement for the optional `ca_store` library. Thanks to @maennchen for the PR. Closes #6.
+* Relaxes the requirement for the optional [castore](https://hex.pm/packages/castore) library. Thanks to @maennchen for the PR. Closes #6.
 
 ## Cldr Utils version 2.19.1
 
