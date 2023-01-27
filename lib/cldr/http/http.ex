@@ -82,7 +82,7 @@ defmodule Cldr.Http do
   ```
 
   """
-  @spec get(String.t) :: {:ok, binary} | {:not_modified, any()} | {:error, any}
+  @spec get(String.t | {String.t, list()}) :: {:ok, binary} | {:not_modified, any()} | {:error, any}
   def get(url) when is_binary(url) do
     case get_with_headers(url) do
       {:ok, _headers, body} -> {:ok, body}
@@ -90,14 +90,25 @@ defmodule Cldr.Http do
     end
   end
 
-  @spec get_with_headers(String.t) :: {:ok, list(), binary} | {:not_modified, any()} | {:error, any}
+  def get({url, headers}) when is_binary(url) and is_list(headers) do
+    case get_with_headers({url, headers}) do
+      {:ok, _headers, body} -> {:ok, body}
+      other -> other
+    end
+  end
+
+  @spec get_with_headers(String.t | {String.t, list()}) :: {:ok, list(), binary} | {:not_modified, any()} | {:error, any}
   def get_with_headers(url) when is_binary(url) do
+    get_with_headers({url, []})
+  end
+
+  def get_with_headers({url, headers}) when is_binary(url) and is_list(headers) do
     require Logger
 
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
 
-    case :httpc.request(:get, {url, headers()}, https_opts(hostname), []) do
+    case :httpc.request(:get, {url, headers}, https_opts(hostname), []) do
       {:ok, {{_version, 200, _}, headers, body}} ->
         {:ok, headers, body}
 
@@ -129,11 +140,6 @@ defmodule Cldr.Http do
 
         {:error, other}
     end
-  end
-
-  defp headers do
-    # [{'Connection', 'close'}]
-    []
   end
 
   @certificate_locations [

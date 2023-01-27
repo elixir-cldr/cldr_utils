@@ -16,4 +16,12 @@ defmodule Cldr.Http.Test do
     end) =~ "Failed to connect to 'zzzzzzzzzzzzzzzz.com'"
   end
 
+  test "Request with headers" do
+    assert {:ok, _body} = Cldr.Http.get({"https://google.com", [{'Accept-Language', '*'}]})
+  end
+
+  test "Request with headers returning headers" do
+    assert {:ok, _headers, _body} = Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]})
+  end
+
 end
