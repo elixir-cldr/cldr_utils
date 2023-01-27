@@ -18,11 +18,25 @@ defmodule Cldr.Http do
 
   ### Arguments
 
-  * `url` is a binary URL
+  * `url` is a binary URL or a `{url, list_of_headers}` tuple. If
+    provided the headers are a list of `{'header_name', 'header_value'}`
+    tuples. Note that the name and value are both charlists, not
+    strings.
+
+  * `options` is a keyword list of options
+
+  ### Options
+
+  * `:verify_peer` is a boolean value indicating
+    if peer verification should be done for this request.
+    The default is `true`.
 
   ### Returns
 
   * `{:ok, body}` if the return is successful
+
+  * `{:not_modified, headers}` if the request would result in
+    returning the same results as one matching an etag
 
   * `{:error, error}` if the download is
      unsuccessful. An error will also be logged
@@ -82,33 +96,134 @@ defmodule Cldr.Http do
   ```
 
   """
-  @spec get(String.t | {String.t, list()}) :: {:ok, binary} | {:not_modified, any()} | {:error, any}
-  def get(url) when is_binary(url) do
-    case get_with_headers(url) do
+  @spec get(String.t | {String.t, list()}, options :: Keyword.t) ::
+    {:ok, binary} | {:not_modified, any()} | {:error, any}
+
+  def get(url, options \\ [])
+
+  def get(url, options) when is_binary(url) and is_list(options) do
+    case get_with_headers(url, options) do
       {:ok, _headers, body} -> {:ok, body}
       other -> other
     end
   end
 
-  def get({url, headers}) when is_binary(url) and is_list(headers) do
-    case get_with_headers({url, headers}) do
+  def get({url, headers}, options) when is_binary(url) and is_list(headers) and is_list(options) do
+    case get_with_headers({url, headers}, options) do
       {:ok, _headers, body} -> {:ok, body}
       other -> other
     end
   end
 
-  @spec get_with_headers(String.t | {String.t, list()}) :: {:ok, list(), binary} | {:not_modified, any()} | {:error, any}
-  def get_with_headers(url) when is_binary(url) do
-    get_with_headers({url, []})
+  @doc """
+  Securely download https content from
+  a URL.
+
+  This function uses the built-in `:httpc`
+  client but enables certificate verification
+  which is not enabled by `:httc` by default.
+
+  See also https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl
+
+  ### Arguments
+
+  * `url` is a binary URL or a `{url, list_of_headers}` tuple. If
+    provided the headers are a list of `{'header_name', 'header_value'}`
+    tuples. Note that the name and value are both charlists, not
+    strings.
+
+  * `options` is a keyword list of options
+
+  ### Options
+
+  * `:verify_peer` is a boolean value indicating
+    if peer verification should be done for this request.
+    The default is `true`.
+
+  ### Returns
+
+  * `{:ok, body, headers}` if the return is successful
+
+  * `{:not_modified, headers}` if the request would result in
+    returning the same results as one matching an etag
+
+  * `{:error, error}` if the download is
+     unsuccessful. An error will also be logged
+     in these cases.
+
+  ### Unsafe HTTPS
+
+  If the environment variable `CLDR_UNSAFE_HTTPS` is
+  set to anything other than `FALSE`, `false`, `nil`
+  or `NIL` then no peer verification of certificates
+  is performed. Setting this variable is not recommended
+  but may be required is where peer verification for
+  unidentified reasons. Please [open an issue](https://github.com/elixir-cldr/cldr/issues)
+  if this occurs.
+
+  ### Certificate stores
+
+  In order to keep dependencies to a minimum,
+  `get/1` attempts to locate an already installed
+  certificate store. It will try to locate a
+  store in the following order which is intended
+  to satisfy most host systems. The certificate
+  store is expected to be a path name on the
+  host system.
+
+  ```elixir
+  # A certificate store configured by the
+  # developer
+  Application.get_env(:ex_cldr, :cacertfile)
+
+  # Populated if hex package `CAStore` is configured
+  CAStore.file_path()
+
+  # Populated if hex package `certfi` is configured
+  :certifi.cacertfile()
+
+  # Debian/Ubuntu/Gentoo etc.
+  "/etc/ssl/certs/ca-certificates.crt",
+
+  # Fedora/RHEL 6
+  "/etc/pki/tls/certs/ca-bundle.crt",
+
+  # OpenSUSE
+  "/etc/ssl/ca-bundle.pem",
+
+  # OpenELEC
+  "/etc/pki/tls/cacert.pem",
+
+  # CentOS/RHEL 7
+  "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+
+  # Open SSL on MacOS
+  "/usr/local/etc/openssl/cert.pem",
+
+  # MacOS & Alpine Linux
+  "/etc/ssl/cert.pem"
+  ```
+
+  """
+  @doc since: "2.20.0"
+
+  @spec get_with_headers(String.t | {String.t, list()}, options :: Keyword.t) ::
+    {:ok, list(), binary} | {:not_modified, any()} | {:error, any}
+
+  def get_with_headers(request, options \\ [])
+
+  def get_with_headers(url, options) when is_binary(url) do
+    get_with_headers({url, []}, options)
   end
 
-  def get_with_headers({url, headers}) when is_binary(url) and is_list(headers) do
+  def get_with_headers({url, headers}, options) when is_binary(url) and is_list(headers) and is_list(options) do
     require Logger
 
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
+    verify_peer? = Keyword.get(options, :verify_peer, true)
 
-    case :httpc.request(:get, {url, headers}, https_opts(hostname), []) do
+    case :httpc.request(:get, {url, headers}, https_opts(hostname, verify_peer?), []) do
       {:ok, {{_version, 200, _}, headers, body}} ->
         {:ok, headers, body}
 
@@ -215,8 +330,8 @@ defmodule Cldr.Http do
     file
   end
 
-  defp https_opts(hostname) do
-    if secure_ssl?() do
+  defp https_opts(hostname, verify_peer?) do
+    if secure_ssl?() and verify_peer? do
       [ssl:
         [
           verify: :verify_peer,
