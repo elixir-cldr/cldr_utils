@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.20.0
+
+This is the changelog for Cldr Utils v2.20.0 released on January 27th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Enhancements
+
+* Adds `Cldr.Http.get_with_headers/1` that will return the headers from the response as well as the body.
+
 ## Cldr Utils version 2.19.2
 
 This is the changelog for Cldr Utils v2.19.2 released on January 25th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

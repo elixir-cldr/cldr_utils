@@ -82,17 +82,27 @@ defmodule Cldr.Http do
   ```
 
   """
-  @spec get(String.t) :: {:ok, binary} | {:error, any}
-
+  @spec get(String.t) :: {:ok, binary} | {:not_modified, any()} | {:error, any}
   def get(url) when is_binary(url) do
+    case get_with_headers(url) do
+      {:ok, _headers, body} -> {:ok, body}
+      other -> other
+    end
+  end
+
+  @spec get_with_headers(String.t) :: {:ok, list(), binary} | {:not_modified, any()} | {:error, any}
+  def get_with_headers(url) when is_binary(url) do
     require Logger
 
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
 
     case :httpc.request(:get, {url, headers()}, https_opts(hostname), []) do
-      {:ok, {{_version, 200, 'OK'}, _headers, body}} ->
-        {:ok, body}
+      {:ok, {{_version, 200, _}, headers, body}} ->
+        {:ok, headers, body}
+
+      {:ok, {{_version, 304, _}, headers, _body}} ->
+        {:not_modified, headers}
 
       {_, {{_version, code, message}, _headers, _body}} ->
         Logger.bare_log(
