@@ -205,7 +205,7 @@ defmodule Cldr.Http do
   ```
 
   """
-  @doc since: "2.20.0"
+  @doc since: "2.21.0"
 
   @spec get_with_headers(String.t | {String.t, list()}, options :: Keyword.t) ::
     {:ok, list(), binary} | {:not_modified, any()} | {:error, any}

@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.21.0
+
+This is the changelog for Cldr Utils v2.20.0 released on January 27th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Enhancements
+
+* Add `:verify_peer` as an option to `Cldr.Http.get/1` and `Cldr.Http.get_with_headers/1`
+
 ## Cldr Utils version 2.20.0
 
 This is the changelog for Cldr Utils v2.20.0 released on January 27th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
