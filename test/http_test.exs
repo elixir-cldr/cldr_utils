@@ -29,7 +29,7 @@ defmodule Cldr.Http.Test do
   end
 
   test "Request with connection timeout" do
-    options = [connection_timeout: 5]
+    options = [connection_timeout: 2]
 
     assert capture_log(fn ->
       assert {:error, :connection_timeout} =
@@ -38,7 +38,7 @@ defmodule Cldr.Http.Test do
   end
 
   test "Request with timeout" do
-    options = [timeout: 5]
+    options = [timeout: 2]
 
     assert capture_log(fn ->
       assert {:error, :timeout} =
