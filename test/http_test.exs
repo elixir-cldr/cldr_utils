@@ -28,4 +28,22 @@ defmodule Cldr.Http.Test do
     assert {:ok, _headers, _body} = Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]})
   end
 
+  test "Request with connection timeout" do
+    options = [connection_timeout: 5]
+
+    assert capture_log(fn ->
+      assert {:error, :connection_timeout} =
+        Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]}, options)
+    end) =~ "Timeout connecting to 'google.com'"
+  end
+
+  test "Request with timeout" do
+    options = [timeout: 5]
+
+    assert capture_log(fn ->
+      assert {:error, :timeout} =
+        Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]}, options)
+    end) =~ "Timeout downloading from 'https://google.com'. Request exceeded #{inspect options[:timeout]}ms."
+  end
+
 end

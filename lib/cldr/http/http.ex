@@ -5,6 +5,8 @@ defmodule Cldr.Http do
   """
 
   @cldr_unsafe_https "CLDR_UNSAFE_HTTPS"
+  @cldr_default_timeout "120000"
+  @cldr_default_connection_timeout "60000"
 
   @doc """
   Securely download https content from
@@ -23,20 +25,33 @@ defmodule Cldr.Http do
     tuples. Note that the name and value are both charlists, not
     strings.
 
-  * `options` is a keyword list of options
+  * `options` is a keyword list of options.
 
   ### Options
 
   * `:verify_peer` is a boolean value indicating
     if peer verification should be done for this request.
-    The default is `true`.
+    The default is `true` in which case the default
+    `:ssl` options follow the [erlef guidelines](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl)
+    noted above.
+
+  * `:timeout` is the number of milliseconds available
+    for the request to complete. The default is
+    #{inspect @cldr_default_timeout}. This option may also be
+    set with the `CLDR_HTTP_TIMEOUT` environment variable.
+
+  * `:connection_timeout` is the number of milliseconds
+    available for the a connection to be estabklished to
+    the remote host. The default is #{inspect @cldr_default_connection_timeout}.
+    This option may also be set with the
+    `CLDR_HTTP_CONNECTION_TIMEOUT` environment variable.
 
   ### Returns
 
-  * `{:ok, body}` if the return is successful
+  * `{:ok, body}` if the return is successful.
 
   * `{:not_modified, headers}` if the request would result in
-    returning the same results as one matching an etag
+    returning the same results as one matching an etag.
 
   * `{:error, error}` if the download is
      unsuccessful. An error will also be logged
@@ -132,20 +147,33 @@ defmodule Cldr.Http do
     tuples. Note that the name and value are both charlists, not
     strings.
 
-  * `options` is a keyword list of options
+  * `options` is a keyword list of options.
 
   ### Options
 
   * `:verify_peer` is a boolean value indicating
     if peer verification should be done for this request.
-    The default is `true`.
+    The default is `true` in which case the default
+    `:ssl` options follow the [erlef guidelines](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl)
+    noted above.
+
+  * `:timeout` is the number of milliseconds available
+    for the request to complete. The default is
+    #{inspect @cldr_default_timeout}. This option may also be
+    set with the `CLDR_HTTP_TIMEOUT` environment variable.
+
+  * `:connection_timeout` is the number of milliseconds
+    available for the a connection to be estabklished to
+    the remote host. The default is #{inspect @cldr_default_connection_timeout}.
+    This option may also be set with the
+    `CLDR_HTTP_CONNECTION_TIMEOUT` environment variable.
 
   ### Returns
 
-  * `{:ok, body, headers}` if the return is successful
+  * `{:ok, body, headers}` if the return is successful.
 
   * `{:not_modified, headers}` if the request would result in
-    returning the same results as one matching an etag
+    returning the same results as one matching an etag.
 
   * `{:error, error}` if the download is
      unsuccessful. An error will also be logged
@@ -221,9 +249,9 @@ defmodule Cldr.Http do
 
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
-    verify_peer? = Keyword.get(options, :verify_peer, true)
+    http_options = http_opts(hostname, options)
 
-    case :httpc.request(:get, {url, headers}, https_opts(hostname, verify_peer?), []) do
+    case :httpc.request(:get, {url, headers}, http_options, []) do
       {:ok, {{_version, 200, _}, headers, body}} ->
         {:ok, headers, body}
 
@@ -240,12 +268,22 @@ defmodule Cldr.Http do
         {:error, code}
 
       {:error, {:failed_connect, [{_, {host, _port}}, {_, _, sys_message}]}} ->
-        Logger.bare_log(
-          :error,
-          "Failed to connect to #{inspect(host)} to download #{inspect url}"
-        )
+        if sys_message == :timeout do
+          Logger.bare_log(
+            :error,
+            "Timeout connecting to #{inspect(host)} to download #{inspect url}. " <>
+            "Connection time exceeded #{http_options[:connect_timeout]}ms."
+          )
 
-        {:error, sys_message}
+          {:error, :connection_timeout}
+        else
+          Logger.bare_log(
+            :error,
+            "Failed to connect to #{inspect(host)} to download #{inspect url}"
+          )
+
+          {:error, sys_message}
+        end
 
       {:error, {other}} ->
         Logger.bare_log(
@@ -254,6 +292,14 @@ defmodule Cldr.Http do
         )
 
         {:error, other}
+
+      {:error, :timeout} ->
+        Logger.bare_log(
+          :error,
+          "Timeout downloading from #{inspect url}. " <>
+          "Request exceeded #{http_options[:timeout]}ms."
+        )
+        {:error, :timeout}
     end
   end
 
@@ -330,35 +376,50 @@ defmodule Cldr.Http do
     file
   end
 
-  defp https_opts(hostname, verify_peer?) do
+  def http_opts(hostname, options) do
+    default_timeout =
+      "CLDR_HTTP_TIMEOUT"
+      |> System.get_env(@cldr_default_timeout)
+      |> String.to_integer()
+
+    default_connection_timeout =
+      "CLDR_HTTP_CONNECTION_TIMEOUT"
+      |> System.get_env(@cldr_default_connection_timeout)
+      |> String.to_integer()
+
+    verify_peer? = Keyword.get(options, :verify_peer, true)
+    ssl_options = https_ssl_opts(hostname, verify_peer?)
+    timeout = Keyword.get(options, :timeout, default_timeout)
+    connection_timeout = Keyword.get(options, :connection_timeout, default_connection_timeout)
+
+    [timeout: timeout, connect_timeout: connection_timeout, ssl: ssl_options]
+  end
+
+  defp https_ssl_opts(hostname, verify_peer?) do
     if secure_ssl?() and verify_peer? do
-      [ssl:
-        [
-          verify: :verify_peer,
-          cacertfile: certificate_store(),
-          depth: 4,
-          ciphers: preferred_ciphers(),
-          versions: protocol_versions(),
-          eccs: preferred_eccs(),
-          reuse_sessions: true,
-          server_name_indication: hostname,
-          secure_renegotiate: true,
-          customize_hostname_check: [
-            match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-          ]
+      [
+        verify: :verify_peer,
+        cacertfile: certificate_store(),
+        depth: 4,
+        ciphers: preferred_ciphers(),
+        versions: protocol_versions(),
+        eccs: preferred_eccs(),
+        reuse_sessions: true,
+        server_name_indication: hostname,
+        secure_renegotiate: true,
+        customize_hostname_check: [
+          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
         ]
       ]
     else
-      [ssl:
-        [
-          verify: :verify_none,
-          server_name_indication: hostname,
-          secure_renegotiate: true,
-          reuse_sessions: true,
-          versions: protocol_versions(),
-          ciphers: preferred_ciphers(),
-          versions: protocol_versions(),
-        ]
+      [
+        verify: :verify_none,
+        server_name_indication: hostname,
+        secure_renegotiate: true,
+        reuse_sessions: true,
+        versions: protocol_versions(),
+        ciphers: preferred_ciphers(),
+        versions: protocol_versions(),
       ]
     end
   end

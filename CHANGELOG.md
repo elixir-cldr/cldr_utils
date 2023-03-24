@@ -1,8 +1,18 @@
 # Changelog
 
+## Cldr Utils version 2.22.0
+
+This is the changelog for Cldr Utils v2.22.0 released on March 25th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Enhancements
+
+* Adds `:timeout` and `:connection_timeout` options to `Cldr.Http.get/2`. The defaults are `[timeout: 60_000, connection_timeout: 120_000]`. The environment variables `CLDR_HTTP_TIMEOUT` and `CLDR_HTTPS_CONNECTION_TIMEOUT` can also be used to set the timeouts. The prededence is `options[:timeout] -> environment variable -> default.`
+
 ## Cldr Utils version 2.21.0
 
-This is the changelog for Cldr Utils v2.20.0 released on January 27th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.21.0 released on January 27th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 **Cldr Utils now requires Elixir 1.11 or later**
 
