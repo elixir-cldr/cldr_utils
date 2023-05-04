@@ -197,9 +197,9 @@ defmodule Cldr.Http do
   `Cldr.Http.get/2` will look for a proxy URL in the following
   locales in the order presented:
 
-  * `options[:https_proxy]
+  * `options[:https_proxy]`
   * `ex_cldr` compile-time configuration under the
-    key `ex_cldr` -> `:https_proxy`
+    key `:ex_cldr[:https_proxy]`
   * The environment variable `HTTPS_PROXY`
   * The environment variable `https_proxy`
 
