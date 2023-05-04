@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.23.1
+
+This is the changelog for Cldr Utils v2.23.0 released on May 4th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Bug Fixes
+
+* Make parsing `HTTP_PROXY` values more resilient to invalid URLs.
+
 ## Cldr Utils version 2.23.0
 
 This is the changelog for Cldr Utils v2.23.0 released on May 4th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

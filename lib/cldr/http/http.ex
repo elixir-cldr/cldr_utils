@@ -267,8 +267,12 @@ defmodule Cldr.Http do
     https_proxy = https_proxy(options)
 
     if https_proxy do
-      %{host: host, port: port} = URI.parse(https_proxy)
-      :httpc.set_options([{:https_proxy, {{String.to_charlist(host), port}, []}}])
+      case URI.parse(https_proxy) do
+        %{host: host, port: port} when is_binary(host) and is_integer(port) ->
+          :httpc.set_options([{:https_proxy, {{String.to_charlist(host), port}, []}}])
+        _other ->
+          Logger.bare_log(:warning, "https_proxy was set to an invalid value. Found #{inspect https_proxy}.")
+      end
     end
 
     case :httpc.request(:get, {url, headers}, http_options, []) do
