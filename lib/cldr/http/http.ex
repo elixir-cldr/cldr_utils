@@ -168,6 +168,9 @@ defmodule Cldr.Http do
     This option may also be set with the
     `CLDR_HTTP_CONNECTION_TIMEOUT` environment variable.
 
+  * `:https_proxy` is the URL of an https proxy to be used. The
+    default is `nil`.
+
   ### Returns
 
   * `{:ok, body, headers}` if the return is successful.
@@ -188,6 +191,17 @@ defmodule Cldr.Http do
   but may be required is where peer verification for
   unidentified reasons. Please [open an issue](https://github.com/elixir-cldr/cldr/issues)
   if this occurs.
+
+  ### Https Proxy
+
+  `Cldr.Http.get/2` will look for a proxy URL in the following
+  locales in the order presented:
+
+  * `options[:https_proxy]
+  * `ex_cldr` compile-time configuration under the
+    key `ex_cldr` -> `:https_proxy`
+  * The environment variable `HTTPS_PROXY`
+  * The environment variable `https_proxy`
 
   ### Certificate stores
 
@@ -250,6 +264,12 @@ defmodule Cldr.Http do
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
     http_options = http_opts(hostname, options)
+    https_proxy = https_proxy(options)
+
+    if https_proxy do
+      %{host: host, port: port} = URI.parse(https_proxy)
+      :httpc.set_options([{:https_proxy, {{String.to_charlist(host), port}, []}}])
+    end
 
     case :httpc.request(:get, {url, headers}, http_options, []) do
       {:ok, {{_version, 200, _}, headers, body}} ->
@@ -337,7 +357,7 @@ defmodule Cldr.Http do
   |> Enum.reject(&is_nil/1)
 
   @doc false
-  def certificate_store do
+  defp certificate_store do
     @certificate_locations
     |> Enum.find(&File.exists?/1)
     |> raise_if_no_cacertfile!
@@ -376,7 +396,7 @@ defmodule Cldr.Http do
     file
   end
 
-  def http_opts(hostname, options) do
+  defp http_opts(hostname, options) do
     default_timeout =
       "CLDR_HTTP_TIMEOUT"
       |> System.get_env(@cldr_default_timeout)
@@ -424,7 +444,7 @@ defmodule Cldr.Http do
     end
   end
 
-  def preferred_ciphers do
+  defp preferred_ciphers do
     preferred_ciphers =
       [
         # Cipher suites (TLS 1.3): TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
@@ -447,7 +467,7 @@ defmodule Cldr.Http do
     :ssl.filter_cipher_suites(preferred_ciphers, [])
   end
 
-  def protocol_versions do
+  defp protocol_versions do
     if otp_version() < 25 do
       [:"tlsv1.2"]
     else
@@ -455,13 +475,13 @@ defmodule Cldr.Http do
     end
   end
 
-  def preferred_eccs do
+  defp preferred_eccs do
     # TLS curves: X25519, prime256v1, secp384r1
     preferred_eccs = [:secp256r1, :secp384r1]
     :ssl.eccs() -- (:ssl.eccs() -- preferred_eccs)
   end
 
-  def secure_ssl? do
+  defp secure_ssl? do
     case System.get_env(@cldr_unsafe_https) do
       nil -> true
       "FALSE" -> false
@@ -470,6 +490,13 @@ defmodule Cldr.Http do
       "NIL" -> false
       _other -> true
     end
+  end
+
+  defp https_proxy(options) do
+    options[:https_proxy] ||
+    Application.get_env(:ex_cldr, :https_proxy) ||
+    System.get_env("HTTPS_PROXY") ||
+    System.get_env("https_proxy")
   end
 
   def otp_version do
