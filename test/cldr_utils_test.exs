@@ -1,7 +1,7 @@
 defmodule CldrUtilsTest do
   use ExUnit.Case, async: true
 
-  doctest CldrUtils
+  doctest Cldr.Utils
 
   doctest Cldr.Math
   doctest Cldr.Digits

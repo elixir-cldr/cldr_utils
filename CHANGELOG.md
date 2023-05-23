@@ -1,5 +1,15 @@
 # Changelog
 
+## Cldr Utils version 2.24.0
+
+This is the changelog for Cldr Utils v2.24.0 released on May 22nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+**Cldr Utils now requires Elixir 1.11 or later**
+
+### Enhancements
+
+* Adds `Cldr.Utils.otp_version/0` to return the OTP version as a string. Copied with thanks and appreciation from the `Hex` source.
+
 ## Cldr Utils version 2.23.1
 
 This is the changelog for Cldr Utils v2.23.0 released on May 4th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
