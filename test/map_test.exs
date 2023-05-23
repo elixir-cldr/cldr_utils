@@ -109,13 +109,13 @@ defmodule Support.Map.Test do
   end
 
   test "Cldr.Map.extract_strings/2" do
-    assert Cldr.Map.extract_strings(%{a: "string", b: :atom, c: "Another string"}) ==
+    assert Cldr.Map.extract_strings(%{a: "string", b: :atom, c: "Another string"}) |> Enum.sort() ==
       ["Another string", "string"]
 
-    assert Cldr.Map.extract_strings(%{a: "string", b: %{c: "Another string"}}) ==
+    assert Cldr.Map.extract_strings(%{a: "string", b: %{c: "Another string"}}) |> Enum.sort() ==
       ["Another string", "string"]
 
-    assert Cldr.Map.extract_strings(%{a: "string", b: [:c, "Another string"]}) ==
+    assert Cldr.Map.extract_strings(%{a: "string", b: [:c, "Another string"]}) |> Enum.sort() ==
       ["Another string", "string"]
   end
 

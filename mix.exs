@@ -19,7 +19,7 @@ defmodule Cldr.Utils.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         ignore_warnings: ".dialyzer_ignore_warnings",
-        plt_add_apps: ~w(inets decimal)a
+        plt_add_apps: ~w(inets decimal certifi castore)a
       ],
       compilers: Mix.compilers()
     ]
@@ -41,7 +41,7 @@ defmodule Cldr.Utils.MixProject do
     [
       {:decimal, "~> 1.9 or ~> 2.0"},
       {:castore, "~> 0.1 or ~> 1.0", optional: true},
-      {:certifi, "~> 2.5", optional: true},
+      {:certifi, "~> 2.5", optional: true, manager: :rebar3},
       {:ex_doc, ">= 0.0.0", optional: true, only: [:dev, :release], runtime: false},
       {:stream_data, "~> 0.5", optional: true, only: :test},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev], runtime: false},

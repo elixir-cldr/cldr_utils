@@ -99,13 +99,13 @@ defmodule Cldr.Math do
       4.0
 
       iex> Cldr.Math.mod(Decimal.new("1234.456"), 5)
-      #Decimal<4.456>
+      Decimal.new("4.456")
 
       iex> Cldr.Math.mod(Decimal.new("123.456"), Decimal.new("3.4"))
-      #Decimal<1.056>
+      Decimal.new("1.056")
 
       iex> Cldr.Math.mod Decimal.new("123.456"), 3.4
-      #Decimal<1.056>
+      Decimal.new("1.056")
 
   """
   @spec mod(number_or_decimal, number_or_decimal) :: number_or_decimal
@@ -182,6 +182,7 @@ defmodule Cldr.Math do
 
   This version will return the divisor if the remainder
   would otherwise be zero.
+
   """
   @spec div_amod(integer, integer) :: {integer, integer}
   def div_amod(int1, int2) do
@@ -202,6 +203,7 @@ defmodule Cldr.Math do
   This is very likely to lose precision - lots of numbers won't
   make the round trip conversion.  Use with care.  Actually, better
   not to use it at all.
+
   """
   @spec to_float(%Decimal{}) :: float
   def to_float(%Decimal{sign: sign, coef: coef, exp: exp}) do
@@ -231,7 +233,7 @@ defmodule Cldr.Math do
       0.0004
 
       iex> Cldr.Math.round_significant(Decimal.from_float(3.342742283480345e27), 7)
-      #Decimal<3.342742E+27>
+      Decimal.new("3.342742E+27")
 
   ## Notes about precision
 
@@ -283,6 +285,7 @@ defmodule Cldr.Math do
     counted)
 
   Many thanks to [Stackoverflow](http://stackoverflow.com/questions/202302/rounding-to-an-arbitrary-number-of-significant-digits)
+
   """
   @spec round_significant(number_or_decimal, integer) :: number_or_decimal
   def round_significant(number, n) when is_number(number) and n <= 0 do
@@ -353,7 +356,7 @@ defmodule Cldr.Math do
       4.812184355372417
 
       iex> Cldr.Math.log(Decimal.new(9000))
-      #Decimal<9.103886231350952380952380952>
+      Decimal.new("9.103886231350952380952380952")
 
   """
   def log(number) when is_number(number) do
@@ -408,7 +411,7 @@ defmodule Cldr.Math do
       2.089905111439398
 
       iex> Cldr.Math.log10(Decimal.new(9000))
-      #Decimal<3.953767554157656512064441441>
+      Decimal.new("3.953767554157656512064441441")
 
   """
   @spec log10(number_or_decimal) :: number_or_decimal
@@ -567,13 +570,13 @@ defmodule Cldr.Math do
   ## Examples
 
       Cldr.Math.coef_exponent(Decimal.new(1.23004))
-      {#Decimal<1.23004>, 0}
+      {Decimal.new("1.23004"), 0}
 
       Cldr.Math.coef_exponent(Decimal.new(465))
-      {#Decimal<4.65>, 2}
+      {Decimal.new("4.65"), 2}
 
       Cldr.Math.coef_exponent(Decimal.new(-46.543))
-      {#Decimal<-4.6543>, 1}
+      {Decimal.new("-4.6543"), 1}
 
   """
 
@@ -631,10 +634,10 @@ defmodule Cldr.Math do
   ## Examples
 
       iex> Cldr.Math.sqrt(Decimal.new(9))
-      #Decimal<3.0>
+      Decimal.new("3.0")
 
       iex> Cldr.Math.sqrt(Decimal.new("9.869"))
-      #Decimal<3.141496458696078173887197038>
+      Decimal.new("3.141496458696078173887197038")
 
   """
   @precision 0.0001
@@ -707,13 +710,13 @@ defmodule Cldr.Math do
   ## Examples
 
       iex> Cldr.Math.root Decimal.new(8), 3
-      #Decimal<2.0>
+      Decimal.new("2.0")
 
       iex> Cldr.Math.root Decimal.new(16), 4
-      #Decimal<2.0>
+      Decimal.new("2.0")
 
       iex> Cldr.Math.root Decimal.new(27), 3
-      #Decimal<3.0>
+      Decimal.new("3.0")
 
   """
   def root(%Decimal{} = number, nth) when is_integer(nth) and nth > 0 do
