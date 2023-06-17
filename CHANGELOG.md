@@ -2,7 +2,7 @@
 
 ## Cldr Utils version 2.24.1
 
-This is the changelog for Cldr Utils v2.24.0 released on June 17th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.24.1 released on June 17th, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 **Cldr Utils now requires Elixir 1.11 or later**
 
