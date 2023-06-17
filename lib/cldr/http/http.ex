@@ -350,22 +350,22 @@ defmodule Cldr.Http do
     "/etc/ssl/cert.pem"
   ]
 
-  defp dymanic_certificate_locations do
+  defp dynamic_certificate_locations do
     [
       # Configured cacertfile
       Application.get_env(:ex_cldr, :cacertfile),
 
       # Populated if hex package CAStore is configured
-      if(Code.ensure_loaded?(CAStore), do: CAStore.file_path()),
+      if(Code.ensure_loaded?(CAStore), do: apply(CAStore, :file_path, [])),
 
       # Populated if hex package certfi is configured
-      if(Code.ensure_loaded?(:certifi), do: :certifi.cacertfile() |> List.to_string())
+      if(Code.ensure_loaded?(:certifi), do: apply(:certifi, :cacertfile, []) |> List.to_string())
     ]
     |> Enum.reject(&is_nil/1)
   end
 
   def certificate_locations() do
-    dymanic_certificate_locations() ++ @static_certificate_locations
+    dynamic_certificate_locations() ++ @static_certificate_locations
   end
 
   @doc false
@@ -395,7 +395,7 @@ defmodule Cldr.Http do
        be automatically detected after recomilation.
 
     3. Specify the location of a certificate trust store
-       by configuring it in `config.exs`:
+       by configuring it in `config.exs` or `runtime.exs`:
 
        config :ex_cldr,
          cacertfile: "/path/to/cacertfile",
