@@ -17,7 +17,7 @@ defmodule Cldr.Math.RoundingTest do
     assert Cldr.Math.round(1.235e-4, 3, :half_even) == 0.0
   end
 
-  for mode <- Cldr.Math.rounding_modes do
+  for mode <- Cldr.Math.rounding_modes() do
     number = 100_000.00
     test "rounding 100_000.00 with mode #{inspect mode}" do
       assert unquote(number) == Cldr.Math.round(unquote(number), 2, unquote(mode))

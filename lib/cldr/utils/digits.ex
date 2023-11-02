@@ -354,7 +354,7 @@ defmodule Cldr.Digits do
   A "compact" representation is returned, so there may be fewer digits returned
   than the decimal point location.
   """
-  def to_digits(0.0), do: {[0], 1, 1}
+  def to_digits(float_0) when float_0 == 0.0, do: {[0], 1, 1}
   def to_digits(0), do: {[0], 1, 1}
 
   def to_digits(float) when is_float(float) do

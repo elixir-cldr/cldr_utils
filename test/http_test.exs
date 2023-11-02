@@ -28,7 +28,7 @@ defmodule Cldr.Http.Test do
     assert {:ok, _headers, _body} = Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]})
   end
 
-  if Version.compare(System.version, "1.14.9") == :gt do
+  if Version.compare(System.version(), "1.14.9") == :gt do
     test "Request with connection timeout" do
       options = [connection_timeout: 2]
 
