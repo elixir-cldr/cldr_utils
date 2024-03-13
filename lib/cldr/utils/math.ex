@@ -26,6 +26,80 @@ defmodule Cldr.Math do
   @ten Decimal.new(10)
 
   @doc """
+  Adds two numbers together.
+
+  The numbers can be integers, floats or Decimals.
+  The type of the return will be Decimal if the
+  either of the arguments is a Decimal.
+
+  If both arguments are integers, the result will
+  be an integer. If either of the arguments is a float,
+  the result will be a float.
+
+  """
+  @doc since: "2.25.0"
+  def add(%Decimal{} = num_1, %Decimal{} = num_2) do
+    Decimal.add(num_1, num_2)
+  end
+
+  def add(%Decimal{} = num_1, num_2) when is_integer(num_2) do
+    Decimal.add(num_1, num_2)
+  end
+
+  def add(%Decimal{} = num_1, num_2) when is_float(num_2) do
+    Decimal.add(num_1, Decimal.from_float(num_2))
+  end
+
+  def add(num_1, %Decimal{} = num_2) when is_integer(num_1) do
+    Decimal.add(num_1, num_2)
+  end
+
+  def add(num_1, %Decimal{} = num_2) when is_float(num_1) do
+    Decimal.add(Decimal.from_float(num_1), num_2)
+  end
+
+  def add(num_1, num_2) when is_number(num_1) and is_number(num_2) do
+    num_1 + num_2
+  end
+
+  @doc """
+  Subtracts one number from another.
+
+  The numbers can be integers, floats or Decimals.
+  The type of the return will be Decimal if the
+  either of the arguments is a Decimal.
+
+  If both arguments are integers, the result will
+  be an integer. If either of the arguments is a float,
+  the result will be a float.
+
+  """
+  @doc since: "2.25.0"
+  def sub(%Decimal{} = num_1, %Decimal{} = num_2) do
+    Decimal.sub(num_1, num_2)
+  end
+
+  def sub(%Decimal{} = num_1, num_2) when is_integer(num_2) do
+    Decimal.sub(num_1, num_2)
+  end
+
+  def sub(%Decimal{} = num_1, num_2) when is_float(num_2) do
+    Decimal.sub(num_1, Decimal.from_float(num_2))
+  end
+
+  def sub(num_1, %Decimal{} = num_2) when is_integer(num_1) do
+    Decimal.sub(num_1, num_2)
+  end
+
+  def sub(num_1, %Decimal{} = num_2) when is_float(num_1) do
+    Decimal.sub(Decimal.from_float(num_1), num_2)
+  end
+
+  def sub(num_1, num_2) when is_number(num_1) and is_number(num_2) do
+    num_1 - num_2
+  end
+
+  @doc """
   Multiplies two numbers together.
 
   The numbers can be integers, floats or Decimals.
@@ -96,6 +170,48 @@ defmodule Cldr.Math do
 
   def div(num_1, num_2) when is_number(num_1) and is_number(num_2) do
     Decimal.from_float(num_1 / num_2)
+  end
+
+  @decimal_0 Decimal.new(0)
+
+  @doc """
+  Raises one number to an exponent.
+
+  """
+  def pow(_any, @decimal_0) do
+    1
+  end
+
+  def pow(1, _any) do
+    1
+  end
+
+  def pow(a, b) when is_integer(b) do
+    Cldr.Math.power(a, b)
+    |> maybe_integer
+  end
+
+  # Decimal.integer? only on 2.x but we support 1.x
+  # so we have to check the hard way
+
+  def maybe_integer(%Decimal{} = a) do
+    Decimal.to_integer(a)
+  rescue
+    FunctionClauseError ->
+      a
+    ArgumentError ->
+      a
+  end
+
+  def maybe_integer(a) when is_float(a) do
+    case trunc(a) do
+      b when a == b -> b
+      _b -> a
+    end
+  end
+
+  def maybe_integer(a) when is_integer(a) do
+    a
   end
 
   @doc false
