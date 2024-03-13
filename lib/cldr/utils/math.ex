@@ -70,7 +70,7 @@ defmodule Cldr.Math do
   either of the arguments is a Decimal.
 
   If both arguments are numbers, the resulting type
-  will be a float.
+  will be a be a Decimal.
 
   """
   @doc since: "2.25.0"
@@ -95,7 +95,7 @@ defmodule Cldr.Math do
   end
 
   def div(num_1, num_2) when is_number(num_1) and is_number(num_2) do
-    num_1 * num_2
+    Decimal.from_float(num_1 / num_2)
   end
 
   @doc false
