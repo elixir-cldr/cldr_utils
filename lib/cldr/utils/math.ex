@@ -3,6 +3,7 @@ defmodule Cldr.Math do
   Math helper functions for number formatting.
   """
 
+  import Kernel, except: [div: 2]
   alias Cldr.Digits
   require Integer
 
@@ -36,7 +37,8 @@ defmodule Cldr.Math do
   the result will be a float.
 
   """
-  def mult(%Decimal{} = num_1, %Decimal{} = num_2) when is_integer(num_2) do
+  @doc since: "2.25.0"
+  def mult(%Decimal{} = num_1, %Decimal{} = num_2) do
     Decimal.mult(num_1, num_2)
   end
 
@@ -71,7 +73,8 @@ defmodule Cldr.Math do
   will be a float.
 
   """
-  def div(%Decimal{} = num_1, %Decimal{} = num_2) when is_integer(num_2) do
+  @doc since: "2.25.0"
+  def div(%Decimal{} = num_1, %Decimal{} = num_2) do
     Decimal.div(num_1, num_2)
   end
 
