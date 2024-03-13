@@ -24,6 +24,77 @@ defmodule Cldr.Math do
   @two Decimal.new(2)
   @ten Decimal.new(10)
 
+  @doc """
+  Multiplies two numbers together.
+
+  The numbers can be integers, floats or Decimals.
+  The type of the return will be Decimal if the
+  either of the arguments is a Decimal.
+
+  If both arguments are integers, the result will
+  be an integer. If either of the arguments is a float,
+  the result will be a float.
+
+  """
+  def mult(%Decimal{} = num_1, %Decimal{} = num_2) when is_integer(num_2) do
+    Decimal.mult(num_1, num_2)
+  end
+
+  def mult(%Decimal{} = num_1, num_2) when is_integer(num_2) do
+    Decimal.mult(num_1, num_2)
+  end
+
+  def mult(%Decimal{} = num_1, num_2) when is_float(num_2) do
+    Decimal.mult(num_1, Decimal.from_float(num_2))
+  end
+
+  def mult(num_1, %Decimal{} = num_2) when is_integer(num_1) do
+    Decimal.mult(num_1, num_2)
+  end
+
+  def mult(num_1, %Decimal{} = num_2) when is_float(num_1) do
+    Decimal.mult(Decimal.from_float(num_1), num_2)
+  end
+
+  def mult(num_1, num_2) when is_number(num_1) and is_number(num_2) do
+    num_1 * num_2
+  end
+
+  @doc """
+  Divides one number by the other.
+
+  The numbers can be integers, floats or Decimals.
+  The type of the return will be Decimal if the
+  either of the arguments is a Decimal.
+
+  If both arguments are numbers, the resulting type
+  will be a float.
+
+  """
+  def div(%Decimal{} = num_1, %Decimal{} = num_2) when is_integer(num_2) do
+    Decimal.div(num_1, num_2)
+  end
+
+  def div(%Decimal{} = num_1, num_2) when is_integer(num_2) do
+    Decimal.div(num_1, num_2)
+  end
+
+  def div(%Decimal{} = num_1, num_2) when is_float(num_2) do
+    Decimal.div(num_1, Decimal.from_float(num_2))
+  end
+
+  def div(num_1, %Decimal{} = num_2) when is_integer(num_1) do
+    Decimal.div(num_1, num_2)
+  end
+
+  def div(num_1, %Decimal{} = num_2) when is_float(num_1) do
+    Decimal.div(Decimal.from_float(num_1), num_2)
+  end
+
+  def div(num_1, num_2) when is_number(num_1) and is_number(num_2) do
+    num_1 * num_2
+  end
+
   @doc false
   @deprecated "Use Cldr.Decimal.compare/2"
   def decimal_compare(d1, d2) do

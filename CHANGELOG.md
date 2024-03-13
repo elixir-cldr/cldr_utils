@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.18.0 requires Elixir 1.11 or later**
 
+## Cldr Utils version 2.25.0
+
+This is the changelog for Cldr Utils v2.24.2 released on November 2nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Enhancements
+
+* Adds `Cldr.Math.mult/2` and `Cldr.Math.div/2` to operate on integers, floats and Decimals.
+
 ## Cldr Utils version 2.24.2
 
 This is the changelog for Cldr Utils v2.24.2 released on November 2nd, 2023.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
