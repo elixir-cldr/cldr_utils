@@ -6,6 +6,10 @@
 
 This is the changelog for Cldr Utils v2.25.0 released on _______.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
+### Bug Fixes
+
+* Fix `Cldr.Math.pow/2` when the exponent is in the range 0 < n < 1.
+
 ### Enhancements
 
 * Adds `Cldr.Math.mult/2`, `Cldr.Math.div/2`, `Cldr.Math.add/2` and `Cldr.Math.sub/2` to operate on integers, floats and Decimals.
