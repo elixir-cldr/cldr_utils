@@ -172,24 +172,6 @@ defmodule Cldr.Math do
     Decimal.from_float(num_1 / num_2)
   end
 
-  @decimal_0 Decimal.new(0)
-
-  @doc """
-  Raises one number to an exponent.
-
-  """
-  def pow(_any, @decimal_0) do
-    1
-  end
-
-  def pow(1, _any) do
-    1
-  end
-
-  def pow(a, b) when is_integer(b) do
-    Cldr.Math.power(a, b)
-    |> maybe_integer
-  end
 
   # Decimal.integer? only on 2.x but we support 1.x
   # so we have to check the hard way
@@ -345,11 +327,10 @@ defmodule Cldr.Math do
   Returns the adjusted modulus of `x` and `y`.
   """
   @spec amod(number_or_decimal, number_or_decimal) :: number_or_decimal
-  @decimal_zero Decimal.new(0)
   def amod(x, y) do
     case mod = mod(x, y) do
       %Decimal{} = decimal_mod ->
-        if Cldr.Decimal.compare(decimal_mod, @decimal_zero) == :eq, do: y, else: mod
+        if Cldr.Decimal.compare(decimal_mod, @zero) == :eq, do: y, else: mod
 
       _ ->
         if mod == 0, do: y, else: mod
@@ -360,8 +341,8 @@ defmodule Cldr.Math do
   Returns the remainder and dividend of two integers.
   """
   @spec div_mod(integer, integer) :: {integer, integer}
-  def div_mod(int1, int2) do
-    div = div(int1, int2)
+  def div_mod(int1, int2) when is_integer(int1) and is_integer(int2) do
+    div = Kernel.div(int1, int2)
     mod = int1 - div * int2
     {div, mod}
   end
@@ -375,7 +356,7 @@ defmodule Cldr.Math do
 
   """
   @spec div_amod(integer, integer) :: {integer, integer}
-  def div_amod(int1, int2) do
+  def div_amod(int1, int2) when is_integer(int1) and is_integer(int2) do
     {div, mod} = div_mod(int1, int2)
 
     if mod == 0 do
@@ -676,6 +657,11 @@ defmodule Cldr.Math do
     Decimal.div(@one, do_power(number, abs(n), mod(abs(n), 2)))
   end
 
+  # n is between 0 and 1
+  def power(%Decimal{} = number, n) do
+    do_power(number, n, mod(number, n))
+  end
+
   # For integers and floats
   def power(number, n) when n == 0 do
     if is_integer(number), do: 1, else: 1.0
@@ -709,6 +695,10 @@ defmodule Cldr.Math do
   end
 
   # Decimal number but integer n
+  defp do_power(%Decimal{} = number, 1, 1) do
+    number
+  end
+
   defp do_power(%Decimal{} = number, n, mod)
        when is_number(n) and mod == 0 and n == 2 do
     Decimal.mult(number, number)
@@ -720,8 +710,15 @@ defmodule Cldr.Math do
   end
 
   defp do_power(%Decimal{} = number, n, _mod)
-       when is_number(n) do
+       when is_number(n)  and n > 1 do
     Decimal.mult(number, power(number, n - 1))
+  end
+
+  # Escape hatch for when the exponent < 1
+  defp do_power(%Decimal{} = number, n, _mod) when n < 1 do
+    number
+    |> Decimal.to_float()
+    |> :math.pow(n)
   end
 
   # integer/float number and integer/float n
@@ -735,8 +732,12 @@ defmodule Cldr.Math do
     power(power(number, n / 2), 2)
   end
 
-  defp do_power(number, n, _mod) do
-    number * power(number, n - 1)
+  defp do_power(number, n, _mod) when is_number(number) and is_number(n) do
+    if Kernel.round(n) != n do
+      :math.pow(number, n)
+    else
+      number * power(number, n - 1)
+    end
   end
 
   # Precompute powers of 10 up to 10^326
@@ -750,6 +751,12 @@ defmodule Cldr.Math do
   def power_of_10(n) when n < 0 do
     1 / power_of_10(abs(n))
   end
+
+  @doc """
+  Raises one number to an exponent.
+
+  """
+  defdelegate pow(n, m), to: __MODULE__, as: :power
 
   @doc """
   Returns a tuple representing a number in a normalized form with
