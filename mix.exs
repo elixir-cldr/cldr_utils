@@ -44,7 +44,7 @@ defmodule Cldr.Utils.MixProject do
       {:certifi, "~> 2.5", optional: true},
       {:ex_doc, ">= 0.0.0", optional: true, only: [:dev, :release], runtime: false},
       {:stream_data, "~> 0.5", optional: true, only: :test},
-      {:dialyxir, "~> 1.0", optional: true, only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0", optional: true, only: [:dev, :test], runtime: false},
       {:benchee, "~> 1.0", optional: true, only: [:dev], runtime: false}
     ]
   end
