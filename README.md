@@ -1,11 +1,10 @@
 # Cldr Utils
 
-![Build Status](http://sweatbox.noexpectations.com.au:8080/buildStatus/icon?job=cldr_utils)
-[![Module Version](https://img.shields.io/hexpm/v/cldr_utils.svg)](https://hex.pm/packages/cldr_utils)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/cldr_utils/)
-[![Total Download](https://img.shields.io/hexpm/dt/cldr_utils.svg)](https://hex.pm/packages/cldr_utils)
-[![License](https://img.shields.io/hexpm/l/cldr_utils.svg)](https://github.com/elixir-cldr/cldr_utils/blob/master/LICENSE)
-[![Last Updated](https://img.shields.io/github/last-commit/elixir-cldr/cldr_utils.svg)](https://github.com/elixir-cldr/cldr_utils/commits/master)
+![Build status](https://github.com/elixir-cldr/cldr_utils/actions/workflows/ci.yml/badge.svg)
+[![Hex.pm](https://img.shields.io/hexpm/v/cldr_utils.svg)](https://hex.pm/packages/cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/dw/cldr_utils.svg?)](https://hex.pm/packages/cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/dt/cldr_utils.svg?)](https://hex.pm/packages/cldr_utils)
+[![Hex.pm](https://img.shields.io/hexpm/l/cldr_utils.svg)](https://hex.pm/packages/ex_cldr)
 
 Utility functions extracted from [Cldr](https://github.com/elixir-cldr/cldr).
 
