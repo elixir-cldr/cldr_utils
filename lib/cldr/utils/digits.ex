@@ -100,7 +100,7 @@ defmodule Cldr.Digits do
       iex> Cldr.Digits.number_of_digits(1234.56789098765)
       15
 
-      iex> Cldr.Digits.number_of_digits '12345'
+      iex> Cldr.Digits.number_of_digits(~c"12345")
       5
 
   """
@@ -151,7 +151,7 @@ defmodule Cldr.Digits do
       iex> Cldr.Digits.number_of_integer_digits(1234.456)
       4
 
-      iex> Cldr.Digits.number_of_integer_digits '12345'
+      iex> Cldr.Digits.number_of_integer_digits(~c"12345")
       5
 
   """

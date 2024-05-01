@@ -250,7 +250,7 @@ defmodule Cldr.Math do
 
   # When checking if a decimal is in a range it is only
   # valid if there are no decimal places
-  def within(number, first..last) when is_float(number) do
+  def within(number, %{first: first, last: last}) when is_float(number) do
     number == trunc(number) && number >= first && number <= last
   end
 

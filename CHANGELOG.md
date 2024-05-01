@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.18.0 requires Elixir 1.11 or later**
 
+## Cldr Utils version 2.26.0
+
+This is the changelog for Cldr Utils v2.25.0 released on March 20th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix warnings on Elixir 1.17. This primarily relates to charlists constants now required to use `sigil_c` to avoid warnings. As a result, tests will only work on Elixir 1.16 and later even though support for the library is for Elixir 1.11 and later.
+
 ## Cldr Utils version 2.25.0
 
 This is the changelog for Cldr Utils v2.25.0 released on March 20th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

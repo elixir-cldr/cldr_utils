@@ -2,6 +2,9 @@ defmodule Cldr.Http.Test do
   use ExUnit.Case
   import ExUnit.CaptureLog
 
+  @accept_language String.to_charlist("Accept-Language")
+  @any String.to_charlist("*")
+
   test "Downloading an https url" do
     assert {:ok, _body} = Cldr.Http.get("https://google.com")
   end
@@ -17,15 +20,15 @@ defmodule Cldr.Http.Test do
   end
 
   test "Request with headers" do
-    assert {:ok, _body} = Cldr.Http.get({"https://google.com", [{'Accept-Language', '*'}]})
+    assert {:ok, _body} = Cldr.Http.get({"https://google.com", [{@accept_language, @any}]})
   end
 
   test "Request with headers and no peer verification" do
-    assert {:ok, _body} = Cldr.Http.get({"https://google.com", [{'Accept-Language', '*'}]}, verify_peer: false)
+    assert {:ok, _body} = Cldr.Http.get({"https://google.com", [{@accept_language, @any}]}, verify_peer: false)
   end
 
   test "Request with headers returning headers" do
-    assert {:ok, _headers, _body} = Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]})
+    assert {:ok, _headers, _body} = Cldr.Http.get_with_headers({"https://google.com", [{@accept_language, @any}]})
   end
 
   if Version.compare(System.version(), "1.14.9") == :gt do
@@ -34,7 +37,7 @@ defmodule Cldr.Http.Test do
 
       assert capture_log(fn ->
         assert {:error, :connection_timeout} =
-          Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]}, options)
+          Cldr.Http.get_with_headers({"https://google.com", [{@accept_language, @any}]}, options)
       end) =~ "Timeout connecting to ~c\"google.com\""
     end
 
@@ -43,7 +46,7 @@ defmodule Cldr.Http.Test do
 
       assert capture_log(fn ->
         assert {:error, :timeout} =
-          Cldr.Http.get_with_headers({"https://google.com", [{'Accept-Language', '*'}]}, options)
+          Cldr.Http.get_with_headers({"https://google.com", [{@accept_language, @any}]}, options)
       end) =~ "Timeout downloading from ~c\"https://google.com\". Request exceeded #{inspect options[:timeout]}ms."
     end
   end
