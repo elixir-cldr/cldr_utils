@@ -8,7 +8,7 @@ This is the changelog for Cldr Utils v2.26.0 released on June 23rd, 2024.  For o
 
 ### Minimu Elixir version
 
-* `cldr_utils` requires Elixir 1.12 or later.
+* `cldr_utils` version 2.26.0 and later requires Elixir 1.12 or later.
 
 ### Enhancements
 
