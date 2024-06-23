@@ -1,14 +1,14 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.26.0"
+  @version "2.27.0"
   @source_url "https://github.com/elixir-cldr/cldr_utils"
 
   def project do
     [
       app: :cldr_utils,
       version: @version,
-      elixir: "~> 1.11",
+      elixir: "~> 1.12",
       description: description(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -43,7 +43,7 @@ defmodule Cldr.Utils.MixProject do
       {:castore, "~> 0.1 or ~> 1.0", optional: true},
       {:certifi, "~> 2.5", optional: true},
       {:ex_doc, ">= 0.0.0", optional: true, only: [:dev, :release], runtime: false},
-      {:stream_data, "~> 0.5", optional: true, only: :test},
+      {:stream_data, "~> 1.0", optional: true, only: :test},
       {:dialyxir, "~> 1.0", optional: true, only: [:dev, :test], runtime: false},
       {:benchee, "~> 1.0", optional: true, only: [:dev], runtime: false}
     ]

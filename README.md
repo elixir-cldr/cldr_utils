@@ -12,6 +12,7 @@ Utility functions extracted from [Cldr](https://github.com/elixir-cldr/cldr).
 * Math functions including `mod/2` that works on floored division
 * Number functions for working with the number of digits, the fraction as an integer, ...
 * String function for underscoring (converting CamelCase to snake case)
+* Cldr.Json.decode!/1 to wrap OTP 27's `:json` module
 * Various macros
 
 ## Installation
@@ -26,17 +27,9 @@ def deps do
 end
 ```
 
-## Benchmark
-
-To run the benchmark:
-
-```bash
-$ mix run benchee/decimal.exs
-```
-
 ## Copyright and License
 
-Copyright (c) 2017 Kip Cole
+Copyright (c) 2017-2024 Kip Cole
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

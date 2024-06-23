@@ -1,6 +1,25 @@
 # Changelog
 
-**Cldr Utils from version 2.18.0 requires Elixir 1.11 or later**
+**Cldr Utils from version 2.26.0 requires Elixir 1.12 or later**
+
+## Cldr Utils version 2.26.0
+
+This is the changelog for Cldr Utils v2.26.0 released on June 23rd, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Minimu Elixir version
+
+* `cldr_utils` requires Elixir 1.12 or later.
+
+### Enhancements
+
+* Adds `Cldr.Json.decode!/1` that delegates to `:json.decode/1`. This allows `Cldr.Json` to be configured as a `json_library` in `ex_cldr` for OTP versions 27 and later.  For example:
+
+```elixir
+config :ex_cldr,
+  json_library: Cldr.Json
+```
+
+* Refactor some tests so they work on older Elixir versions without `sigil_c`.
 
 ## Cldr Utils version 2.26.0
 
@@ -28,7 +47,7 @@ This is the changelog for Cldr Utils v2.24.2 released on November 2nd, 2023.  Fo
 
 ### Bug Fixes
 
-* Fix depracation warnings for Elixir 1.16.
+* Fix deprecation warnings for Elixir 1.16.
 
 ## Cldr Utils version 2.24.1
 

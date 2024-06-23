@@ -15,8 +15,8 @@ defmodule Cldr.Http.Test do
 
   test "Downloading an unknown url" do
     capture_log(fn ->
-      assert {:error, :nxdomain} = Cldr.Http.get("https://zzzzzzzzzzzzzzzz.com")
-    end) =~ "Failed to connect to 'zzzzzzzzzzzzzzzz.com'"
+      assert {:error, :nxdomain} = Cldr.Http.get("https://xzzzzzzzzzzzzzzzz.com")
+    end) =~ "Failed to connect to 'xzzzzzzzzzzzzzzzz.com'"
   end
 
   test "Request with headers" do
@@ -33,12 +33,13 @@ defmodule Cldr.Http.Test do
 
   if Version.compare(System.version(), "1.14.9") == :gt do
     test "Request with connection timeout" do
+
       options = [connection_timeout: 2]
 
       assert capture_log(fn ->
         assert {:error, :connection_timeout} =
           Cldr.Http.get_with_headers({"https://google.com", [{@accept_language, @any}]}, options)
-      end) =~ "Timeout connecting to ~c\"google.com\""
+      end) =~ "Timeout connecting to"
     end
 
     test "Request with timeout" do
@@ -47,7 +48,7 @@ defmodule Cldr.Http.Test do
       assert capture_log(fn ->
         assert {:error, :timeout} =
           Cldr.Http.get_with_headers({"https://google.com", [{@accept_language, @any}]}, options)
-      end) =~ "Timeout downloading from ~c\"https://google.com\". Request exceeded #{inspect options[:timeout]}ms."
+      end) =~ "Timeout downloading from"
     end
   end
 end
