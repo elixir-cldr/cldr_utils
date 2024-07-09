@@ -10,6 +10,8 @@ defmodule CldrUtilsTest do
   doctest Cldr.String
 
   if Code.ensure_loaded?(:json) do
+    doctest Cldr.Json
+
     test "Cldr.Json proxy" do
       assert Cldr.Json.decode!("{}") == %{}
     end

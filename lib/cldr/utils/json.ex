@@ -15,9 +15,38 @@ if Code.ensure_loaded?(:json) do
     ```
 
     """
+    @doc since: "2.27.0"
 
+    @doc """
+    Implements a Jason-compatible decode!/1,2 function suitable
+    for decoding CLDR json data.
+
+    ### Example
+
+        iex> Cldr.Json.decode!("{\\"foo\\": 1}")
+        %{"foo" => 1}
+
+        iex> Cldr.Json.decode!("{\\"foo\\": 1}", keys: :atoms)
+        %{foo: 1}
+
+    """
     def decode!(string) do
-      :json.decode(string)
+      {json, :ok, ""} = :json.decode(string, :ok, %{null: nil})
+      json
+    end
+
+    def decode!(string, [keys: :atoms]) do
+      push = fn key, value, acc ->
+        [{String.to_atom(key), value} | acc]
+      end
+
+      decoders = %{
+        null: nil,
+        object_push: push
+      }
+
+      {json, :ok, ""} = :json.decode(string, :ok, decoders)
+      json
     end
 
   end

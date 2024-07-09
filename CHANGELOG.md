@@ -2,6 +2,18 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.28.0
+
+This is the changelog for Cldr Utils v2.28.0 released on July 10th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix `Cldr.Json.decode!/1` to return only the decoded JSON.
+
+### Enhancements
+
+* Add `Cldr.Json.decode!/2` that implements the `keys: :atoms` option from `Jason`.
+
 ## Cldr Utils version 2.27.0
 
 This is the changelog for Cldr Utils v2.27.0 released on June 23rd, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
