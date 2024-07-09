@@ -13,7 +13,7 @@ defmodule CldrUtilsTest do
     doctest Cldr.Json
 
     test "Cldr.Json proxy" do
-      assert Cldr.Json.decode!("{}") == %{}
+      assert %{} = Cldr.Json.decode!("{}")
     end
   end
 end

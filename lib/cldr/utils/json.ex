@@ -48,6 +48,5 @@ if Code.ensure_loaded?(:json) do
       {json, :ok, ""} = :json.decode(string, :ok, decoders)
       json
     end
-
   end
 end
