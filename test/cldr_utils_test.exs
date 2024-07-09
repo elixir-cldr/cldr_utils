@@ -9,7 +9,7 @@ defmodule CldrUtilsTest do
   doctest Cldr.Map
   doctest Cldr.String
 
-  if Code.ensure_loaded?(:json) do
+  if Code.ensure_loaded?(Cldr.Json) do
     doctest Cldr.Json
 
     test "Cldr.Json proxy" do
