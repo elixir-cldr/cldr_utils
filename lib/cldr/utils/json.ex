@@ -30,12 +30,18 @@ if Code.ensure_loaded?(:json) do
         %{foo: 1}
 
     """
-    def decode!(string) do
+    def decode!(string) when is_binary(string) do
       {json, :ok, ""} = :json.decode(string, :ok, %{null: nil})
       json
     end
 
-    def decode!(string, [keys: :atoms]) do
+    def decode!(charlist) when is_list(charlist) do
+      charlist
+      |> List.to_string()
+      |> decode!()
+    end
+
+    def decode!(string, [keys: :atoms]) when is_binary(string) do
       push = fn key, value, acc ->
         [{String.to_atom(key), value} | acc]
       end
@@ -48,5 +54,12 @@ if Code.ensure_loaded?(:json) do
       {json, :ok, ""} = :json.decode(string, :ok, decoders)
       json
     end
+
+    def decode!(charlist, options) when is_list(charlist) do
+      charlist
+      |> List.to_string()
+      |> decode!(options)
+    end
+
   end
 end

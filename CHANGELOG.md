@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.28.1
+
+This is the changelog for Cldr Utils v2.28.1 released on August 14th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix `Cldr.Json.decode!/1` when calling with a charlist instead of a binary.
+
 ## Cldr Utils version 2.28.0
 
 This is the changelog for Cldr Utils v2.28.0 released on July 10th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
