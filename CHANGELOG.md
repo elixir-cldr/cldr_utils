@@ -8,7 +8,7 @@ This is the changelog for Cldr Utils v2.28.2 released on September 6th, 2024.  F
 
 ### Bug Fixes
 
-* Use `:erlang.iolist_to_binary/1` instead of `List.to_string/1` since the later won't handle some unicode correctlt.
+* Use `:erlang.iolist_to_binary/1` instead of `List.to_string/1` since the later won't handle some unicode correctly.
 
 ## Cldr Utils version 2.28.1
 
