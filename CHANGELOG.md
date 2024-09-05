@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.28.2
+
+This is the changelog for Cldr Utils v2.28.2 released on September 6th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Use `:erlang.iolist_to_binary/1` instead of `List.to_string/1` since the later won't handle some unicode correctlt.
+
 ## Cldr Utils version 2.28.1
 
 This is the changelog for Cldr Utils v2.28.1 released on August 14th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

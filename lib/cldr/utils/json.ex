@@ -37,7 +37,7 @@ if Code.ensure_loaded?(:json) do
 
     def decode!(charlist) when is_list(charlist) do
       charlist
-      |> List.to_string()
+      |> :erlang.iolist_to_binary()
       |> decode!()
     end
 
@@ -57,7 +57,7 @@ if Code.ensure_loaded?(:json) do
 
     def decode!(charlist, options) when is_list(charlist) do
       charlist
-      |> List.to_string()
+      |> :erlang.iolist_to_binary()
       |> decode!(options)
     end
 
