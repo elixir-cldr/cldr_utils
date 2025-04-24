@@ -265,14 +265,17 @@ defmodule Cldr.Http do
     url = String.to_charlist(url)
     http_options = http_opts(hostname, options)
     https_proxy = https_proxy(options)
+    ip_family = :inet6fb4
 
     if https_proxy do
       case URI.parse(https_proxy) do
         %{host: host, port: port} when is_binary(host) and is_integer(port) ->
-          :httpc.set_options([{:https_proxy, {{String.to_charlist(host), port}, []}}])
+          :ok = :httpc.set_options(https_proxy: {{String.to_charlist(host), port}, []}, ipfamily: ip_family)
         _other ->
           Logger.bare_log(:warning, "https_proxy was set to an invalid value. Found #{inspect https_proxy}.")
       end
+    else
+      :ok = :httpc.set_options(ipfamily: ip_family)
     end
 
     case :httpc.request(:get, {url, headers}, http_options, []) do
@@ -291,23 +294,22 @@ defmodule Cldr.Http do
 
         {:error, code}
 
-      {:error, {:failed_connect, [{_, {host, _port}}, {_, _, sys_message}]}} ->
-        if sys_message == :timeout do
-          Logger.bare_log(
-            :error,
-            "Timeout connecting to #{inspect(host)} to download #{inspect url}. " <>
-            "Connection time exceeded #{http_options[:connect_timeout]}ms."
-          )
+      {:error, {:failed_connect, [{:to_address, {host, _port}}, {:inet6, _, _}, {_, _, :timeout}]}} ->
+        Logger.bare_log(
+          :error,
+          "Timeout connecting to #{inspect(host)} to download #{inspect url}. " <>
+          "Connection time exceeded #{http_options[:connect_timeout]}ms."
+        )
 
-          {:error, :connection_timeout}
-        else
-          Logger.bare_log(
-            :error,
-            "Failed to connect to #{inspect(host)} to download #{inspect url}"
-          )
+        {:error, :connection_timeout}
 
-          {:error, sys_message}
-        end
+      {:error, {:failed_connect, [{:to_address, {host, _port}}, {:inet6, _, _}, {_, _, :nxdomain}]}} ->
+        Logger.bare_log(
+          :error,
+          "Failed to resolve host #{inspect(host)} to download #{inspect url}"
+        )
+
+        {:error, :nxdomain}
 
       {:error, {other}} ->
         Logger.bare_log(
