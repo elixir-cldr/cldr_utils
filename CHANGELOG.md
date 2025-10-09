@@ -2,6 +2,12 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.0
+
+This is the changelog for Cldr Utils v2.29.0 released on October 9th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+* Adds `Cldr.Math.float_to_ratio/2`. This function supports formatting numbers as fractions in the upcoming [CLDR 48](https://cldr.unicode.org/downloads/cldr-48) and the relevant `ex_cldr` version. Note that decimals are not currently supported.
+
 ## Cldr Utils version 2.28.3
 
 This is the changelog for Cldr Utils v2.28.3 released on April 28th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
