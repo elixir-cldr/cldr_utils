@@ -1148,22 +1148,13 @@ defmodule Cldr.Math do
     epsilon = Keyword.get(opts, :epsilon, 1.0e-10)
     max_denominator = Keyword.get(opts, :max_denominator)
 
-    cf = continued_fraction(x, max_iterations, epsilon)
+    continued_fraction = continued_fraction(x, max_iterations, epsilon)
 
-    case max_denominator do
-      nil ->
-        cf |> convergents() |> Enum.min_by(&approximation_error(x, &1))
-
-      max_denom ->
-        cf |> best_rational_within_limit(x, max_denom)
+    if max_denominator do
+      convergents_with_limit(continued_fraction, max_denominator)
+    else
+      convergents(continued_fraction)
     end
-  end
-
-  # Finds the best rational approximation with denominator <= max_denominator.
-  # Uses the continued fraction convergents and semi-convergents.
-  defp best_rational_within_limit(cf_coeffs, x, max_denominator) do
-    cf_coeffs
-    |> convergents_with_limit(max_denominator)
     |> Enum.min_by(&approximation_error(x, &1))
   end
 
