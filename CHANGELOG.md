@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.28.3
+
+This is the changelog for Cldr Utils v2.28.3 released on April 28th, 2025.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Set `ip_family: :inet6fb4` in `Cldr.Http` to support both ipv6 and ipv4 for downloading assets. Thanks to @edolnx for the report. Closes #8.
+
 ## Cldr Utils version 2.28.2
 
 This is the changelog for Cldr Utils v2.28.2 released on September 6th, 2024.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

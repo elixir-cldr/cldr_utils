@@ -40,3 +40,4 @@ cldr_utils-*.tar
 .DS_Store
 .iex.exs
 .tool-versions
+mise.toml
