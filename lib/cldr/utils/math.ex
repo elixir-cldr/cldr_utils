@@ -1142,6 +1142,9 @@ defmodule Cldr.Math do
       iex> Cldr.Math.float_to_ratio(3.14159, max_denominator: 10)
       {22, 7}
 
+      iex> Cldr.Math.float_to_ratio(1.42, max_denominator: 10)
+      {10, 7}
+
   """
   def float_to_ratio(x, opts \\ []) do
     max_iterations = Keyword.get(opts, :max_iterations, 20)
@@ -1203,7 +1206,7 @@ defmodule Cldr.Math do
     max_k = div(max_denom - q_prev, q_curr)
 
     # Generate all semi-convergents from k=1 to min(max_k, a-1)
-    1..min(max_k, a - 1)
+    1..min(max_k, a - 1)//1
     |> Enum.map(fn k ->
       {k * p_curr + p_prev, k * q_curr + q_prev}
     end)
