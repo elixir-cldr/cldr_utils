@@ -31,12 +31,7 @@ defmodule Math.Mantissa.Exponent.Test do
 
   Enum.each(@test, fn value ->
     test "Validate coef * 10**exponent == original number of #{inspect(value)}" do
-      test_value =
-        if is_float(unquote(value)) do
-          Decimal.new(unquote(to_string(value)))
-        else
-          Decimal.new(unquote(Macro.escape(value)))
-        end
+      test_value = value(unquote(Macro.escape(value)))
 
       # Calculate the mantissa and exponent
       {coef, exponent} = Cldr.Math.coef_exponent(test_value)
@@ -51,4 +46,7 @@ defmodule Math.Mantissa.Exponent.Test do
       assert Cldr.Decimal.compare(calculated_value, test_value) == :eq
     end
   end)
+
+  def value(value) when is_float(value), do: Decimal.new(to_string(value))
+  def value(value), do: Decimal.new(value)
 end

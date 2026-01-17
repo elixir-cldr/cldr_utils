@@ -259,8 +259,6 @@ defmodule Cldr.Http do
   end
 
   def get_with_headers({url, headers}, options) when is_binary(url) and is_list(headers) and is_list(options) do
-    require Logger
-
     hostname = String.to_charlist(URI.parse(url).host)
     url = String.to_charlist(url)
     http_options = http_opts(hostname, options)
