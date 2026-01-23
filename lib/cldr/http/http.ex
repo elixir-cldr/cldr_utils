@@ -350,7 +350,7 @@ defmodule Cldr.Http do
     "/etc/ssl/cert.pem"
   ]
 
-  defp dynamic_certificate_locations do
+  def dynamic_certificate_locations do
     [
       # Configured cacertfile
       Application.get_env(:ex_cldr, :cacertfile),
@@ -364,16 +364,18 @@ defmodule Cldr.Http do
     |> Enum.reject(&is_nil/1)
   end
 
+  @doc """
+  Return the possible locations of a certificate file.
+  """
   def certificate_locations() do
     dynamic_certificate_locations() ++ @static_certificate_locations
   end
 
   @doc false
-  defp certificate_store do
+  def certificate_store do
     certificate_locations()
     |> Enum.find(&File.exists?/1)
-    |> raise_if_no_cacertfile!
-    |> :erlang.binary_to_list()
+    |> raise_if_no_cacertfile!()
   end
 
   defp raise_if_no_cacertfile!(nil) do
