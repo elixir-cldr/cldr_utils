@@ -309,14 +309,6 @@ defmodule Cldr.Http do
 
         {:error, :nxdomain}
 
-      {:error, {other}} ->
-        Logger.bare_log(
-          :error,
-          "Failed to download #{inspect url}. Error #{inspect other}"
-        )
-
-        {:error, other}
-
       {:error, :timeout} ->
         Logger.bare_log(
           :error,
@@ -324,6 +316,14 @@ defmodule Cldr.Http do
           "Request exceeded #{http_options[:timeout]}ms."
         )
         {:error, :timeout}
+
+      {:error, other} ->
+        Logger.bare_log(
+          :error,
+          "Failed to download #{inspect url}. Error #{inspect other}"
+        )
+
+        {:error, other}
     end
   end
 

@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.4
+
+This is the changelog for Cldr Utils v2.29.4 released on January 25th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fixes the catch-all error return for `Cldr.Http.get/2` which in turn fixes that case clause error reported in #9.
+
 ## Cldr Utils version 2.29.3
 
 This is the changelog for Cldr Utils v2.29.3 released on January 24th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
