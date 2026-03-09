@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.5
+
+This is the changelog for Cldr Utils v2.29.5 released on March 9th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fix clause ordering in `Cldr.Digits`, fixing a compiler warning on Elixir 1.20.0-rc.2.
+
 ## Cldr Utils version 2.29.4
 
 This is the changelog for Cldr Utils v2.29.4 released on January 25th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
