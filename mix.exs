@@ -84,7 +84,7 @@ defmodule Cldr.Utils.MixProject do
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}",
-      formatters: ["html"],
+      formatters: ["html", "markdown"],
       logo: "logo.png",
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"]
     ]
