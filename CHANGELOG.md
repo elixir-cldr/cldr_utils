@@ -10,6 +10,8 @@ This is the changelog for Cldr Utils v2.29.6 released on May 8th, 2026.  For old
 
 * Allow `Decimal` 3.0.0 as a valid dependency.
 
+* `Cldr.Math.sqrt/2` now respects the current `Decimal.Context.get/0` precision when called with a `Decimal` — the result is rounded to the configured precision and Newton's-method convergence scales accordingly. The optional `precision` argument, previously inert, is now an absolute convergence threshold (default derived from the context).
+
 ## Cldr Utils version 2.29.5
 
 This is the changelog for Cldr Utils v2.29.5 released on March 16th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
