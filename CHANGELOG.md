@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.6
+
+This is the changelog for Cldr Utils v2.29.6 released on May 8th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Allow `Decimal` 3.0.0 as a valid dependency.
+
 ## Cldr Utils version 2.29.5
 
 This is the changelog for Cldr Utils v2.29.5 released on March 16th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

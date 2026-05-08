@@ -527,7 +527,7 @@ defmodule Cldr.Math do
       4.812184355372417
 
       iex> Cldr.Math.log(Decimal.new(9000))
-      Decimal.new("9.103886231350952380952380952")
+      Decimal.new("9.103886231350952380952380952380952")
 
   """
   def log(number) when is_number(number) do
@@ -582,7 +582,7 @@ defmodule Cldr.Math do
       2.089905111439398
 
       iex> Cldr.Math.log10(Decimal.new(9000))
-      Decimal.new("3.953767554157656512064441441")
+      Decimal.new("3.953767554157656512064441441036289")
 
   """
   @spec log10(number_or_decimal) :: number_or_decimal
@@ -817,29 +817,47 @@ defmodule Cldr.Math do
   end
 
   @doc """
-  Calculates the square root of a Decimal number using Newton's method.
+  Calculates the square root of a number using Newton's method.
 
-  * `number` is an integer, float or Decimal.  For integer and float,
-  `sqrt` is delegated to the erlang `:math` module.
+  For `Decimal` input the result is rounded to the precision of the current
+  process' `Decimal.Context` (see `Decimal.Context.get/0`). The IEEE 754
+  decimal128 default is 34 digits. Set a different precision with
+  `Decimal.Context.set/1` or `Decimal.Context.with/2` to change the result's
+  precision.
 
-  We convert the Decimal to a float and take its
-  `:math.sqrt` only to get an initial estimate.
-  The means typically we are only two iterations from
-  a solution so the slight hack improves performance
-  without sacrificing precision.
+  Integer and float inputs are delegated to `:math.sqrt/1`.
 
-  ## Examples
+  ### Arguments
+
+  * `number` is the number whose square root is to be calculated. May be an
+    integer, a float, or a `t:Decimal.t/0`.
+
+  * `precision` is the absolute convergence threshold used by Newton's method
+    when `number` is a `t:Decimal.t/0`. When `nil` (the default), the threshold
+    is `10^-precision` where `precision` is the current `Decimal.Context`
+    precision. May also be passed as an integer, a float, or a
+    `t:Decimal.t/0`. Ignored for integer and float input.
+
+  ### Returns
+
+  * A `t:Decimal.t/0` rounded to the current `Decimal.Context` precision when
+    `number` is a `t:Decimal.t/0`.
+
+  * A float when `number` is an integer or float.
+
+  ### Examples
 
       iex> Cldr.Math.sqrt(Decimal.new(9))
       Decimal.new("3.0")
 
-      iex> Cldr.Math.sqrt(Decimal.new("9.869"))
+      iex> Decimal.Context.with(%{Decimal.Context.get() | precision: 28}, fn ->
+      ...>   Cldr.Math.sqrt(Decimal.new("9.869"))
+      ...> end)
       Decimal.new("3.141496458696078173887197038")
 
   """
-  @precision 0.0001
-  @decimal_precision Decimal.from_float(@precision)
-  def sqrt(number, precision \\ @precision)
+  @initial_old_estimate Decimal.from_float(0.0001)
+  def sqrt(number, precision \\ nil)
 
   def sqrt(%Decimal{sign: sign} = number, _precision)
       when sign == -1 do
@@ -847,53 +865,74 @@ defmodule Cldr.Math do
   end
 
   # Get an initial estimate of the sqrt by using the built in `:math.sqrt`
-  # function.  This means typically its only two iterations to get the default
-  # the sqrt at the specified precision.
-  def sqrt(%Decimal{} = number, precision)
-      when is_number(precision) do
+  # function. This means typically only a couple of Newton iterations are
+  # required to converge to the configured `Decimal.Context` precision.
+  def sqrt(%Decimal{} = number, precision) do
     initial_estimate =
       number
       |> to_float
       |> :math.sqrt()
       |> Decimal.from_float()
 
-    decimal_precision =
-      if is_integer(precision) do
-        Decimal.new(precision)
-      else
-        Decimal.from_float(precision)
-      end
+    threshold = sqrt_threshold(precision)
 
-    do_sqrt(number, initial_estimate, @decimal_precision, decimal_precision)
+    number
+    |> do_sqrt(initial_estimate, @initial_old_estimate, threshold)
+    |> Decimal.apply_context()
   end
 
   def sqrt(number, _precision) do
     :math.sqrt(number)
   end
 
+  defp sqrt_threshold(nil) do
+    Decimal.new(1, 1, -Decimal.Context.get().precision)
+  end
+
+  defp sqrt_threshold(precision) when is_integer(precision) do
+    Decimal.new(precision)
+  end
+
+  defp sqrt_threshold(precision) when is_float(precision) do
+    Decimal.from_float(precision)
+  end
+
+  defp sqrt_threshold(%Decimal{} = precision), do: precision
+
   defp do_sqrt(
          %Decimal{} = number,
          %Decimal{} = estimate,
          %Decimal{} = old_estimate,
-         %Decimal{} = precision
+         %Decimal{} = threshold
        ) do
     diff =
       estimate
       |> Decimal.sub(old_estimate)
       |> Decimal.abs()
 
-    if Cldr.Decimal.compare(diff, old_estimate) == :lt || Cldr.Decimal.compare(diff, old_estimate) == :eq do
+    if Cldr.Decimal.compare(diff, threshold) in [:lt, :eq] do
       estimate
     else
-      Decimal.div(number, Decimal.mult(@two, estimate))
-
       new_estimate =
         Decimal.add(
           Decimal.div(estimate, @two),
           Decimal.div(number, Decimal.mult(@two, estimate))
         )
 
-      do_sqrt(number, new_estimate, estimate, precision)
+      new_diff =
+        new_estimate
+        |> Decimal.sub(estimate)
+        |> Decimal.abs()
+
+      # Once Newton's method stops reducing the delta we've reached the
+      # precision floor of the active Decimal context — any further iteration
+      # would oscillate in the least significant digit. Return the best
+      # available estimate.
+      if Cldr.Decimal.compare(new_diff, diff) in [:gt, :eq] do
+        new_estimate
+      else
+        do_sqrt(number, new_estimate, estimate, threshold)
+      end
     end
   end
 

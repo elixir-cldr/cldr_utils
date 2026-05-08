@@ -35,7 +35,7 @@ defmodule Math.Log.Test do
   test "log Decimal.new(\"1.33333333333333333333333333333333\")" do
     assert Cldr.Decimal.compare(
              Cldr.Math.log(Decimal.new("1.33333333333333333333333333333333")),
-             Decimal.new("0.2876820724291554672132526174")
+             Decimal.new("0.2876820724291554672132526173305888")
            ) == :eq
   end
 end

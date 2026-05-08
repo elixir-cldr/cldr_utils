@@ -31,7 +31,7 @@ defmodule Cldr.Decimal do
     end
   end
 
-  if Version.match?(decimal_version, "~> 2.0") do
+  if Version.match?(decimal_version, "~> 2.0 or ~> 3.0") do
     def parse(string) do
       case Decimal.parse(string) do
         {decimal, ""} -> {decimal, ""}

@@ -41,3 +41,4 @@ cldr_utils-*.tar
 .iex.exs
 .tool-versions
 mise.toml
+.claude
