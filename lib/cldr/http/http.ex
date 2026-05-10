@@ -498,11 +498,11 @@ defmodule Cldr.Http do
   defp secure_ssl? do
     case System.get_env(@cldr_unsafe_https) do
       nil -> true
-      "FALSE" -> false
-      "false" -> false
-      "nil" -> false
-      "NIL" -> false
-      _other -> true
+      "FALSE" -> true
+      "false" -> true
+      "nil" -> true
+      "NIL" -> true
+      _other -> false
     end
   end
 

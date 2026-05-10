@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.7
+
+This is the changelog for Cldr Utils v2.29.7 released on May 11th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* Fixes inverted `CLDR_UNSAFE_HTTPS` logic in `Cldr.Http`. Setting the variable to anything other than `FALSE`/`false`/`nil`/`NIL` now correctly disables peer certificate verification, matching the documented behaviour. Thanks to @CGA1123 for the report. Closes #10.
+
 ## Cldr Utils version 2.29.6
 
 This is the changelog for Cldr Utils v2.29.6 released on May 8th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
