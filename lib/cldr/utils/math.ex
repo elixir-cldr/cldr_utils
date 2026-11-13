@@ -463,6 +463,21 @@ defmodule Cldr.Math do
     number
   end
 
+  # Zero has no significant digits to round, and no logarithm.
+  def round_significant(number, _n) when is_number(number) and number == 0 do
+    number
+  end
+
+  def round_significant(%Decimal{} = number, n) when n <= 0 do
+    number
+  end
+
+  # Zero, NaN and the infinities are returned as they are: `coef` is
+  # `0`, `:NaN` or `:inf`.
+  def round_significant(%Decimal{coef: coef} = number, _n) when coef == 0 or is_atom(coef) do
+    number
+  end
+
   def round_significant(number, n) when is_number(number) and n > 0 do
     sign = if number < 0, do: -1, else: 1
     number = abs(number)

@@ -2,6 +2,14 @@
 
 **Cldr Utils from version 2.27.0 requires Elixir 1.12 or later**
 
+## Cldr Utils version 2.29.8
+
+This is the changelog for Cldr Utils v2.29.8 released on ______, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+
+### Bug Fixes
+
+* `Cldr.Math.round_significant/2` no longer raises for a `Decimal` with zero or fewer significant digits, nor for zero (integer, float or `Decimal`), NaN or an infinity. Each is returned unchanged, as a float or integer already was for zero digits.
+
 ## Cldr Utils version 2.29.7
 
 This is the changelog for Cldr Utils v2.29.7 released on May 11th, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)

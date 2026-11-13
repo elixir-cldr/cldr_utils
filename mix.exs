@@ -1,7 +1,7 @@
 defmodule Cldr.Utils.MixProject do
   use Mix.Project
 
-  @version "2.29.7"
+  @version "2.29.8"
 
   @source_url "https://github.com/elixir-cldr/cldr_utils"
 

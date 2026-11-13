@@ -67,6 +67,39 @@ defmodule Math.Test do
     end
   end
 
+  test "round significant digits returns a decimal unchanged for zero or fewer digits" do
+    for string <- ["7", "-7", "1.5", "-0.5", "0", "123456789.123"], digits <- [0, -1] do
+      decimal = Decimal.new(string)
+      assert Math.round_significant(decimal, digits) == decimal
+    end
+  end
+
+  test "round significant digits returns zero unchanged" do
+    assert Math.round_significant(0, 3) === 0
+    assert Math.round_significant(0.0, 3) === 0.0
+    assert Math.round_significant(-0.0, 3) === -0.0
+    assert Math.round_significant(Decimal.new("0"), 3) == Decimal.new("0")
+    assert Math.round_significant(Decimal.new("-0"), 3) == Decimal.new("-0")
+    assert Math.round_significant(Decimal.new("0.00"), 3) == Decimal.new("0.00")
+  end
+
+  test "round significant digits returns NaN and infinite decimals unchanged" do
+    for string <- ["NaN", "Infinity", "-Infinity"], digits <- [0, 3] do
+      decimal = Decimal.new(string)
+      assert Math.round_significant(decimal, digits) == decimal
+    end
+  end
+
+  test "round significant digits still rounds non-zero numbers" do
+    assert Math.round_significant(1234, 2) === 1200
+    assert Math.round_significant(-1234, 2) === -1200
+    assert Math.round_significant(3.14159, 3) === 3.14
+    assert Math.round_significant(1234, 0) === 1234
+
+    assert Decimal.equal?(Math.round_significant(Decimal.new("-1234"), 2), Decimal.new("-1200"))
+    assert Decimal.equal?(Math.round_significant(Decimal.new("0.00012345"), 2), Decimal.new("0.00012"))
+  end
+
   if Code.ensure_loaded?(Decimal) && function_exported?(Decimal, :normalize, 1) do
     test "round significant digits for a decimal integer" do
       decimal = Decimal.new(1234)
