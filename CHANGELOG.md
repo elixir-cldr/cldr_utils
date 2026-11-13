@@ -4,7 +4,7 @@
 
 ## Cldr Utils version 2.29.8
 
-This is the changelog for Cldr Utils v2.29.8 released on ______, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
+This is the changelog for Cldr Utils v2.29.8 released on November 14, 2026.  For older changelogs please consult the release tag on [GitHub](https://github.com/elixir-cldr/cldr_utils/tags)
 
 ### Bug Fixes
 
